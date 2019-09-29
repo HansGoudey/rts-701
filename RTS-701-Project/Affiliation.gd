@@ -1,5 +1,7 @@
 extends Node
 
+class_name Affilation
+
 # ID / Color
 
 # Resource Counts

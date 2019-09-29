@@ -1,4 +1,6 @@
-extends Node
+extends Entity
+
+class_name Unit
 
 # Order List (A stack of assigned orders)
 

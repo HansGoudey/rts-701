@@ -1,5 +1,7 @@
 extends Node
 
+class_name Player
+
 """
 A player corresponds to a human interacting with an affiliation. Because of this it will always
 be the child of an 'Affilation' node.

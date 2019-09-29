@@ -3,7 +3,7 @@ For now most are added as member variables for the node scenes with the same nam
 
 For now each node is contained in its own file, but I'm not sure that's the best way to organize it.
 
-**NOTE** *The data in the node structure is more up to date than this, but this can be an overview.
+**NOTE** *The data in the node structure is more up to date than this, but this can be an overview.*
 
 ## Affiliation
 Could possibly have multiple players attached, or at least that possibility could be left open, which is why this is separate data from the *Player.*

@@ -9,6 +9,8 @@ func _ready():
 #func _process(delta):
 #	pass
 
+signal start_game
+
 func _on_StartButton_Pressed():
-	# Probably load the game scene at first, then maybe add an options scene before that
-	pass
+	# Probably load the game scene at first, then maybe add an options panel before that
+	emit_signal("start_game")

@@ -1,4 +1,6 @@
-extends Node
+extends Entity
+
+class_name Building
 
 # Production State (Countdown or position in production process)
 

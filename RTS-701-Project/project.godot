@@ -8,9 +8,50 @@
 
 config_version=4
 
-_global_script_classes=[  ]
+_global_script_classes=[ {
+"base": "Node",
+"class": "Affilation",
+"language": "GDScript",
+"path": "res://Affiliation.gd"
+}, {
+"base": "Entity",
+"class": "Building",
+"language": "GDScript",
+"path": "res://Building.gd"
+}, {
+"base": "Spatial",
+"class": "Entity",
+"language": "GDScript",
+"path": "res://Entity.gd"
+}, {
+"base": "Node",
+"class": "Order",
+"language": "GDScript",
+"path": "res://Order.gd"
+}, {
+"base": "Node",
+"class": "Player",
+"language": "GDScript",
+"path": "res://Player.gd"
+}, {
+"base": "Spatial",
+"class": "Projectile",
+"language": "GDScript",
+"path": "res://Projectile.gd"
+}, {
+"base": "Entity",
+"class": "Unit",
+"language": "GDScript",
+"path": "res://Unit.gd"
+} ]
 _global_script_class_icons={
-
+"Affilation": "",
+"Building": "",
+"Entity": "",
+"Order": "",
+"Player": "",
+"Projectile": "",
+"Unit": ""
 }
 
 [application]
