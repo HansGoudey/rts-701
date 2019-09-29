@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Affiliation.gd" type="Script" id=1]
+
+[node name="Affiliation" type="Node" groups=[
+"Entities",
+]]
+script = ExtResource( 1 )
