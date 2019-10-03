@@ -6,10 +6,10 @@ var affiliations = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	var affi_scene = load("res://Affiliation.tscn")
-	var affi_node = affi_scene.instance()
-	affiliations.append(affi_node)
-	add_child(affi_node)
+	var affiliation_scene = load("res://Affiliation.gd")
+	affiliations.append(affiliation_scene.instance())
+	n_affilations = 1
+	add_child(affiliations[0])
 	
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
