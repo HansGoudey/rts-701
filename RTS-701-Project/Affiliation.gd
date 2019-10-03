@@ -12,10 +12,11 @@ class_name Affilation
 
 # Visible Area (Fog of war)
 
-
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	pass # Replace with function body.
+	var player_scene = load("res://Player.tscn")
+	var player_node = player_scene.instance()
+	add_child(player_node)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

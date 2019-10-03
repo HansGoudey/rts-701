@@ -18,3 +18,4 @@ func start_game():
 	var game_scene = load("res://Game.tscn")
 	var game_node = game_scene.instance()
 	add_child(game_node)
+	get_node("/root/Main/MenuUI").queue_free()
