@@ -11,7 +11,6 @@ be the child of an 'Affilation' node.
 
 # Camera Node (should be child of this node)
 var camera: Camera
-
 var camera_velocity: Vector3 = Vector3(0, 0, 0)
 
 # Called when the node enters the scene tree for the first time.
