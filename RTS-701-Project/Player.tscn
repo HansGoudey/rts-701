@@ -8,5 +8,4 @@
 script = ExtResource( 1 )
 
 [node name="Camera" type="Camera" parent="."]
-transform = Transform( 1, 0, 0, 0, 0.406103, 0.913827, 0, -0.913827, 0.406103, 0, 14.0962, 0 )
-fov = 80.0
+transform = Transform( 1, 0, 0, 0, 0.697067, 0.717006, 0, -0.717006, 0.697067, 0, 4.40992, 0 )

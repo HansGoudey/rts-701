@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Map/Map.gd" type="Script" id=1]
+
+[node name="Map" type="Spatial"]
+script = ExtResource( 1 )
+
+[node name="DirectionalLight" type="DirectionalLight" parent="."]
+transform = Transform( -0.56236, -0.719517, 0.407489, -0.00865531, 0.49789, 0.867197, -0.826847, 0.48415, -0.286221, 0, 0, 0 )
+light_color = Color( 0.909804, 0.866667, 0.74902, 1 )
+shadow_enabled = true
+shadow_contact = 16.0
+directional_shadow_blend_splits = true
+directional_shadow_normal_bias = 16.0
+directional_shadow_max_distance = 2000.0

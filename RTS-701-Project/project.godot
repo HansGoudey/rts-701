@@ -42,7 +42,7 @@ _global_script_classes=[ {
 "base": "Entity",
 "class": "Unit",
 "language": "GDScript",
-"path": "res://Unit.gd"
+"path": "res://Units/Unit.gd"
 } ]
 _global_script_class_icons={
 "Affilation": "",
@@ -99,4 +99,5 @@ camera_down={
 
 [rendering]
 
+quality/directional_shadow/size=8192
 environment/default_environment="res://default_env.tres"
