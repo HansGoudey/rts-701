@@ -9,7 +9,8 @@ var production_active: bool = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	pass # Replace with function body.
+	var building_type_basic_scene = load("res://Buildings/BuildingTypeBasic.tscn")
+	add_child(building_type_basic_scene.instance())
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

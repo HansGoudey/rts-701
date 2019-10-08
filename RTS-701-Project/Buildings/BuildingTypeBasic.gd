@@ -1,20 +1,17 @@
 extends Node
 
-var parent: Unit = null
-var entity: Entity = null
+var parent: Building = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	parent = get_parent()
-	entity = parent.get_parent()
-	initialize_health()
+	
+	var mesh_file = load("res://Buildings/Basic.glb")
+	add_child(mesh_file.instance())
 	
 func initialize_health():
-	entity.health = 100
-	entity.maximum_health = 100
-
-func action_complete(type: int):
-	pass
+	parent.health = 100
+	parent.maximum_health = 100
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):

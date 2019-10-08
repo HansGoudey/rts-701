@@ -19,7 +19,8 @@ var target_location: Vector3 = Vector3(0, 0, 0)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	pass # Replace with function body.
+	var unit_type_basic_scene = load("res://Units/UnitTypeBasic.tscn")
+	add_child(unit_type_basic_scene.instance())
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
