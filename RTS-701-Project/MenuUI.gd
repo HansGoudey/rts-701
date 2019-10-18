@@ -2,7 +2,10 @@ extends Control
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	get_node("ActionsPanel/StartButton").connect("pressed", self, "_on_StartButton_Pressed")
+	# TODO: get sign up done using something simple
+	# 		it could be an existing authentification or 
+	#		something simpler
+	get_node("Menu/GridContainer/JoinServer").connect("pressed", self, "_on_StartButton_Pressed")
 	
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
