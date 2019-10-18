@@ -1,11 +1,14 @@
 
-# Godot-specific ignores
+# Godot-specific Ignores
 .import/
 export.cfg
 export_presets.cfg
 
-# Mono-specific ignores
+# Mono-specific Ignores
 .mono/
 
 # Blender Temporary Files
 *.blend1
+
+# Mac Folder Files
+.DS_Store
