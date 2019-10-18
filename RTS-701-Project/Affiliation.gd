@@ -3,12 +3,17 @@ extends Node
 class_name Affilation
 
 # ID / Color
+var id: String = ""
+var color: Color = Color(0.0, 0.0, 0.0, 1.0)
 
 # Resource Counts
+var resource_1: float = 0
+var resource_2: float = 0
+var resource_3: float = 0
+var resource_4: float = 0
 
 # Linked Player Nodes
-
-# Entities Owned by Affiliation
+var players = []
 
 # Visible Area (Fog of war)
 

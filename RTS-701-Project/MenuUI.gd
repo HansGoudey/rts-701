@@ -10,6 +10,8 @@ func _ready():
 #	pass
 
 signal start_game
+signal host_game
+signal join_game
 
 func _on_StartButton_Pressed():
 	# Probably load the game scene at first, then maybe add an options panel before that
