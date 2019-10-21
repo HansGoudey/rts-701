@@ -3,7 +3,7 @@ extends Spatial
 class_name Entity
 
 # Affiliation (Should be the parent of this node)
-var affiliation: Affilation
+var affiliation: Affiliation
 
 # Health
 var health: int = 0

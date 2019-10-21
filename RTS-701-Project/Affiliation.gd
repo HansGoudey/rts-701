@@ -1,16 +1,16 @@
 extends Node
 
-class_name Affilation
+class_name Affiliation
 
 # ID / Color
-var id: String = ""
+var id:String = ""
 var color: Color = Color(0.0, 0.0, 0.0, 1.0)
 
 # Resource Counts
-var resource_1: float = 0
-var resource_2: float = 0
-var resource_3: float = 0
-var resource_4: float = 0
+var resource_1:float = 0
+var resource_2:float = 0
+var resource_3:float = 0
+var resource_4:float = 0
 
 # Linked Player Nodes
 var players = []
@@ -26,3 +26,9 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	pass
+
+sync func set_color(color:Color):
+	self.color = color
+
+sync func set_id(id:String):
+	self.id = id

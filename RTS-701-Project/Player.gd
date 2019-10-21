@@ -3,27 +3,36 @@ extends Node
 class_name Player
 
 """
-A player corresponds to a human interacting with an affiliation. Because of this it will always
-be the child of an 'Affilation' node.
+A player corresponds to a human interacting with an affiliation. It will always
+be the child of an 'Affiliation' node.
 """
 
+# Name for UI (not the name of the node)
+var id:String = ""
+
+# Affiliation (should be the parent of this node)
+var affiliation:Affiliation = null
+
+# Lobby Information
+var ready_to_start:bool = false
+
 # Mouse Event Handling
-var mouse_down_left: bool = false
-var mouse_drag: bool = false
-var mouse_drag_time: float = 0
-const DRAG_START_TIME: float = 0.2
+var mouse_down_left:bool = false
+var mouse_drag:bool = false
+var mouse_drag_time:float = 0
+const DRAG_START_TIME:float = 0.2
 
 # Box Select State
-var box_select_start: Vector3 = Vector3(0, 0, 0)
-var box_select_end: Vector3 = Vector3(0, 0, 0)
+var box_select_start:Vector3 = Vector3(0, 0, 0)
+var box_select_end:Vector3 = Vector3(0, 0, 0)
 var box_entities = []
 
 # Selected Entities (group of 'Entity' nodes)
 var selected_entities = []
 
 # Camera Node (should be child of this node)
-var camera: Camera
-var camera_velocity: Vector3 = Vector3(0, 0, 0)
+var camera:Camera
+var camera_velocity:Vector3 = Vector3(0, 0, 0)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -52,12 +61,11 @@ func camera_movement(delta):
 # Select the entity under the mouse cursor to the selection
 func select_entity(event: InputEvent):
 	pass
-	
 
 # Intersection of a line with a plane. Returns (0, 0, 0) if parallel.
 # Logic from Blender source at:
 # https://developer.blender.org/diffusion/B/browse/master/source/blender/blenlib/intern/math_geom.c$2181
-func isect_line_plane_v3(l1: Vector3, l2: Vector3, plane_co: Vector3, plane_no: Vector3) -> Vector3:
+static func isect_line_plane_v3(l1: Vector3, l2: Vector3, plane_co: Vector3, plane_no: Vector3) -> Vector3:
 	var u: Vector3 = l2 - l1
 	var h: Vector3 = l1 - plane_co
 	var dot: float = plane_no.dot(u)
@@ -85,8 +93,8 @@ func handle_box_select():
 	box_select_end = project_mouse_to_terrain_plane()
 	
 	# Then find all of the entities within the box
-	var parent_affilation: Affilation = get_parent()
-	for child in parent_affilation.get_children():
+	var parent_affiliation: Affiliation = get_parent()
+	for child in parent_affiliation.get_children():
 		if child is Entity:
 			# Figure out it the entity is in the box, accounting for a the box end being larger or smaller than the start
 			if box_select_start.x < box_select_end.x:

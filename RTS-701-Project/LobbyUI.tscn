@@ -1,0 +1,54 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://LobbyUI.gd" type="Script" id=1]
+
+[sub_resource type="Theme" id=1]
+
+[node name="LobbyUI" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = 896.0
+margin_bottom = 480.0
+script = ExtResource( 1 )
+
+[node name="PlayerItem" type="Panel" parent="."]
+margin_left = 266.76
+margin_top = 165.084
+margin_right = 609.76
+margin_bottom = 203.084
+
+[node name="Ready" type="CheckBox" parent="PlayerItem"]
+margin_left = 271.185
+margin_top = 7.04065
+margin_right = 337.185
+margin_bottom = 31.0406
+text = "Ready"
+
+[node name="Label" type="Label" parent="PlayerItem"]
+margin_left = 8.51743
+margin_top = 12.5903
+margin_right = 48.5174
+margin_bottom = 26.5903
+text = "Player"
+
+[node name="AffiliationItem" type="Panel" parent="."]
+margin_left = 186.0
+margin_top = 80.0
+margin_right = 624.0
+margin_bottom = 151.66
+size_flags_vertical = 3
+theme = SubResource( 1 )
+
+[node name="Label" type="Label" parent="AffiliationItem"]
+margin_left = 22.1702
+margin_top = 19.4383
+margin_right = 145.17
+margin_bottom = 44.4383
+text = "Affiliation"
+valign = 1
+
+[node name="Color" type="ColorRect" parent="AffiliationItem"]
+margin_left = 390.226
+margin_top = 17.4839
+margin_right = 421.226
+margin_bottom = 48.4839
