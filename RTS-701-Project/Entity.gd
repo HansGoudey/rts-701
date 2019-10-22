@@ -17,7 +17,7 @@ func _ready():
 func _process(delta):
 	pass
 
-func damage(health: int, type):
+func damage(health:int, type):
 	self.health -= health
 	
 	if health < 0:

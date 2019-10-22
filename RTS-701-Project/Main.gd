@@ -12,42 +12,36 @@ var affiliations = [] # Only used during lobby phase, game stores
 signal add_player
 signal add_affiliation
 
-# Overall Game State
-enum {START, LOBBY, GAME}
-var game_state:int = START
-
 func _ready():
 	# Load start UI and connect its signals
 	var ui_scene = load("res://StartUI.tscn")
 	var ui_node:Control = ui_scene.instance()
 	add_child(ui_node)
-	game_state = START
-	ui_node.connect("host_game", self, "host_game")
-	ui_node.connect("join_game", self, "join_game")
+	assert(ui_node.connect("host_game", self, "host_game") == OK)
+	assert(ui_node.connect("join_game", self, "join_game") == OK)
 
 	# Connect networking functions
-	get_tree().connect("network_peer_connected", self, "network_peer_connected")
-	get_tree().connect("network_peer_disconnected", self, "_player_disconnected")
-	get_tree().connect("connected_to_server", self, "_connected_ok")
-	get_tree().connect("connection_failed", self, "_connected_fail")
-	get_tree().connect("server_disconnected", self, "_server_disconnected")
+	assert(get_tree().connect("network_peer_connected", self, "network_peer_connected") == OK)
+	assert(get_tree().connect("network_peer_disconnected", self, "_player_disconnected") == OK)
+	assert(get_tree().connect("connected_to_server", self, "_connected_ok") == OK)
+	assert(get_tree().connect("connection_failed", self, "_connected_fail") == OK)
+	assert(get_tree().connect("server_disconnected", self, "_server_disconnected") == OK)
 
-func _process(delta):
-	# In the lobby, start the game if all players are ready
-	if game_state == LOBBY:
-		var all_players_ready:bool = true
-		for player_node in player_info.values():
-			if not player_node.ready_to_start:
-				all_players_ready = false
-				break
-		if all_players_ready:
-			start_game()
-			rpc("start_game")
+# In the lobby, start the game if all players are ready 
+func check_game_start_lobby() -> void:
+	var all_players_ready:bool = true
+	for player_node in player_info.values():
+		if not player_node.ready_to_start:
+			all_players_ready = false
+			break
+	if all_players_ready:
+		start_game()
+		rpc("start_game")
 
 remote func assign_player_to_affiliation(player:Player, affiliation:Affiliation) -> void:
 	# Remove this player from the affiliation its current one
-	if player.affiliation: # Should be true
-		player.affiliation.players.remove(player)
+	if player.affiliation: 
+		player.affiliation.players.erase(player)
 
 	# Add the player to the specified affiliation
 	affiliation.players.append(player)
@@ -65,10 +59,10 @@ remote func add_player(peer_id:int, affiliation:Affiliation, id:String) -> Playe
 	player_node.set_name("Player" + str(peer_id))
 	player_node.set_network_master(peer_id)
 	player_node.id = id
+	assign_player_to_affiliation(player_node, affiliation)
 
 	player_info[id] = player_node
-
-	assign_player_to_affiliation(player_node, affiliation)
+	assert(player_node.connect("ready_to_start", self, "check_game_start_lobby") == 0)
 
 	emit_signal("add_player")
 	return player_node
@@ -87,6 +81,9 @@ remote func add_affiliation(color:Color, id:String) -> Affiliation:
 
 remote func remove_affiliation(name:String) -> void:
 	var affiliation_node:Affiliation = find_node(name, false, true)
+	
+	# TODO: Move this affiliation's players to another affiliation and don't allow deleting the last one
+	
 	if affiliation_node:
 		# TODO: Probably should check the type of the object it found
 		affiliation_node.queue_free()
@@ -94,7 +91,7 @@ remote func remove_affiliation(name:String) -> void:
 # Remove a player from the global list and free it
 remote func remove_player(id:int) -> void:
 	var player:Player = get_player(id)
-	player.affiliation.players.remove(player)
+	player.affiliation.players.erase(player)
 	player.queue_free()
 	player_info[id] = null
 
@@ -105,23 +102,20 @@ remote func start_game():
 	var game_node = game_scene.instance()
 	add_child(game_node)
 	$LobbyUI.queue_free()
-	game_state = GAME
 
 	# Pass the affiliations and players list to the game
 	game_node.affiliations = self.affiliations.duplicate()
 	self.affiliations = null
+	
+	game_node.start_game()
 
 # Start the lobby scene to set up the game, freeing the start UI
 func start_lobby():
-	# Get player name from startUI
-	var player_name_field:TextEdit = $StartUI/NameField
-
 	# Load lobby scene
 	var lobby_scene = load("res://LobbyUI.tscn")
 	var lobby_node = lobby_scene.instance()
 	add_child(lobby_node)
 	$StartUI.queue_free()
-	game_state = LOBBY
 
 func get_start_ui_player_name() -> String:
 	var name_field:TextEdit = $StartUI/NameField
@@ -172,6 +166,7 @@ func network_peer_connected(id):
 		# Add a new player for the player that just joined
 		var new_affiliation:Affiliation = add_affiliation(Color(randf(), randf(), randf()), "New Affiliation")
 		rpc("add_affiliation", Color(randf(), randf(), randf()), "New Affiliation")
+		# warning-ignore:return_value_discarded
 		add_player(self_id, new_affiliation, get_start_ui_player_name())
 		rpc("add_player", self_id, new_affiliation, get_start_ui_player_name())
 

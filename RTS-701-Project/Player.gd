@@ -15,6 +15,7 @@ var affiliation:Affiliation = null
 
 # Lobby Information
 var ready_to_start:bool = false
+signal ready_to_start
 
 # Mouse Event Handling
 var mouse_down_left:bool = false
@@ -56,8 +57,13 @@ func camera_movement(delta):
 	# Smoothly lower the camera velocity
 	camera_velocity *= 0.95
 
-	camera.translation += camera_velocity
-	
+	camera.translate(camera_velocity)
+	rset_unreliable("camera.translation", camera.translation)
+
+func set_lobby_ready(ready:bool) -> void:
+	self.ready_to_start = ready
+	emit_signal("ready_to_start")
+
 # Select the entity under the mouse cursor to the selection
 func select_entity(event: InputEvent):
 	pass
@@ -124,31 +130,33 @@ func end_box_select():
 	box_entities.clear()
 
 func _process(delta):
-	camera_movement(delta)
-	if mouse_down_left:
-		mouse_drag_time += delta
-	if mouse_drag:
-		handle_box_select() # Put this here so the selection updates when there are no mouse events
+	if self.is_network_master():
+		camera_movement(delta)
+		if mouse_down_left:
+			mouse_drag_time += delta
+		if mouse_drag:
+			handle_box_select() # Put this here so the selection updates when there are no mouse events
 
 func _unhandled_input(event: InputEvent):
-	if event is InputEventMouseButton:
-		if event.button_index == BUTTON_LEFT:
-			if event.pressed:
-				# Mouse just pressed or has been pressed
-				mouse_down_left = true
-				if mouse_drag:
-					pass
-				elif mouse_drag_time > DRAG_START_TIME:
-					# Start mouse drag after holding it down for enough time
-					mouse_drag = true
-					start_box_select()
-			else:
-				# Mouse just released
-				mouse_down_left = false
-				# If the mouse wasn't dragging and it was released, run select
-				if mouse_drag:
-					end_box_select()
+	if self.is_network_master():
+		if event is InputEventMouseButton:
+			if event.button_index == BUTTON_LEFT:
+				if event.pressed:
+					# Mouse just pressed or has been pressed
+					mouse_down_left = true
+					if mouse_drag:
+						pass
+					elif mouse_drag_time > DRAG_START_TIME:
+						# Start mouse drag after holding it down for enough time
+						mouse_drag = true
+						start_box_select()
 				else:
-					select_entity(event)
-				mouse_drag = false
-				mouse_drag_time = 0
+					# Mouse just released
+					mouse_down_left = false
+					# If the mouse wasn't dragging and it was released, run select
+					if mouse_drag:
+						end_box_select()
+					else:
+						select_entity(event)
+					mouse_drag = false
+					mouse_drag_time = 0
