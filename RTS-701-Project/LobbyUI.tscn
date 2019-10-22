@@ -17,19 +17,19 @@ margin_top = 165.084
 margin_right = 609.76
 margin_bottom = 203.084
 
-[node name="Ready" type="CheckBox" parent="PlayerItem"]
-margin_left = 271.185
-margin_top = 7.04065
-margin_right = 337.185
-margin_bottom = 31.0406
-text = "Ready"
-
 [node name="Label" type="Label" parent="PlayerItem"]
 margin_left = 8.51743
 margin_top = 12.5903
 margin_right = 48.5174
 margin_bottom = 26.5903
 text = "Player"
+
+[node name="Ready" type="CheckBox" parent="PlayerItem"]
+margin_left = 271.185
+margin_top = 7.04065
+margin_right = 337.185
+margin_bottom = 31.0406
+text = "Ready"
 
 [node name="AffiliationItem" type="Panel" parent="."]
 margin_left = 186.0
