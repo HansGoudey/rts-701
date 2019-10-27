@@ -79,13 +79,36 @@ remote func add_affiliation(color:Color, id:String) -> Affiliation:
 	emit_signal("add_affiliation")
 	return affiliation_node
 
-remote func remove_affiliation(name:String) -> void:
+remote func remove_affiliation(name:String) -> void:	
+	
 	var affiliation_node:Affiliation = find_node(name, false, true)
 	
-	# TODO: Move this affiliation's players to another affiliation and don't allow deleting the last one
-	
-	if affiliation_node:
-		# TODO: Probably should check the type of the object it found
+	if affiliation_node and affiliation_node is Affiliation: # ensure node is found and is an Affiliation
+		
+		if affiliations.size() == 1: # Do not allow deleting the last affiliation
+			return 
+
+		var toMoveTo:int = 0
+		var toDelete: int = 0
+		
+		# Find the affiliation in the list 
+		for i in range(affiliations.size()):
+			if affiliations[i].id == affiliation_node.id:
+				toDelete = i # location of the affiliation to delete in list
+				break
+		
+		if toDelete == 0:  # Move the affiliation to the next one if deleting the first
+			toMoveTo = 1
+		else:
+			toMoveTo = toDelete - 1  # Move the affilition to the previous one in the list
+		
+		var successor: Affiliation = affiliations[toMoveTo]
+		
+		for player in affiliation_node.players:
+			successor.players.append(player)
+		
+		affiliations.erase(affiliation_node)
+		
 		affiliation_node.queue_free()
 
 # Remove a player from the global list and free it
