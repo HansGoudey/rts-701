@@ -6,8 +6,7 @@ var last_ui_build = [] # For clearing the last set of panels built
 func _ready():
 	# Connect signals from updating affiliations and players to UI update function
 	main = find_parent("Main")
-	assert(main.connect("add_player", self, "build_ui") == OK)
-	assert(main.connect("add_affiliation", self, "build_ui") == OK)
+	assert(main.connect("lobby_ui_update", self, "build_ui") == OK)
 	
 	# Connect signals from the UI to the main scene
 	assert($NewAffiliation.connect("pressed", main, "add_affiliation", 
@@ -54,6 +53,9 @@ func build_ui() -> void:
 		# TODO: This connection might be a little hacky
 		assert(join_button.connect("pressed", main, "assign_player_to_affiliation", 
 									[main.get_player(get_tree().get_network_unique_id()), affiliation]) == OK)
+		var delete_button:Button = new_affiliation_item.get_child(3)
+		# TODO: This connection might be a little hacky
+		assert(delete_button.connect("pressed", main, "remove_affiliation", [affiliation]) == OK)
 		
 		# Add subsequent elements are further down
 		y += new_affiliation_item.rect_size.y

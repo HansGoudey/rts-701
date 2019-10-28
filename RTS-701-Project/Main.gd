@@ -9,8 +9,7 @@ const MAX_PLAYERS:int = 10
 var self_id:int = 0
 var player_info = {} # {id: Player node}
 var affiliations = [] # Only used during lobby phase, game stores
-signal add_player
-signal add_affiliation
+signal lobby_ui_update
 
 func _ready():
 	# Load start UI and connect its signals
@@ -42,11 +41,14 @@ remote func assign_player_to_affiliation(player:Player, affiliation:Affiliation)
 	# Remove this player from the affiliation its current one
 	if player.affiliation: 
 		player.affiliation.players.erase(player)
+		player.affiliation.remove_child(player)
 
 	# Add the player to the specified affiliation
 	affiliation.players.append(player)
 	affiliation.add_child(player)
 	player.affiliation = affiliation
+	
+	emit_signal("lobby_ui_update")
 
 # Return the player node associated with a network peer ID
 func get_player(id:int) -> Player:
@@ -64,7 +66,7 @@ remote func add_player(peer_id:int, affiliation:Affiliation, id:String) -> Playe
 	player_info[id] = player_node
 	assert(player_node.connect("ready_to_start", self, "check_game_start_lobby") == 0)
 
-	emit_signal("add_player")
+	emit_signal("lobby_ui_update")
 	return player_node
 
 remote func add_affiliation(color:Color, id:String) -> Affiliation:
@@ -76,40 +78,44 @@ remote func add_affiliation(color:Color, id:String) -> Affiliation:
 	affiliation_node.id = id
 	affiliation_node.color = color
 
-	emit_signal("add_affiliation")
+	emit_signal("lobby_ui_update")
 	return affiliation_node
-
-remote func remove_affiliation(name:String) -> void:	
 	
+remote func remove_affiliation_string(name:String) -> void:
 	var affiliation_node:Affiliation = find_node(name, false, true)
-	
-	if affiliation_node and affiliation_node is Affiliation: # ensure node is found and is an Affiliation
-		
-		if affiliations.size() == 1: # Do not allow deleting the last affiliation
-			return 
+	remove_affiliation(affiliation_node)
 
-		var toMoveTo:int = 0
-		var toDelete: int = 0
+remote func remove_affiliation(affiliation_node:Affiliation) -> void:
+	# Ensure node is found and is an existing Affiliation
+	if not affiliation_node:
+		return
+	if not affiliation_node is Affiliation:
+		return
+	if affiliations.size() == 1: # Do not allow deleting the last affiliation
+		return
 		
-		# Find the affiliation in the list 
-		for i in range(affiliations.size()):
-			if affiliations[i].id == affiliation_node.id:
-				toDelete = i # location of the affiliation to delete in list
-				break
+	# Find the affiliation in the list 
+	var i_to_delete:int = 0
+	for i in range(affiliations.size()):
+		if affiliations[i] == affiliation_node:
+			i_to_delete = i # location of the affiliation to delete in list
+			break
 		
-		if toDelete == 0:  # Move the affiliation to the next one if deleting the first
-			toMoveTo = 1
-		else:
-			toMoveTo = toDelete - 1  # Move the affilition to the previous one in the list
-		
-		var successor: Affiliation = affiliations[toMoveTo]
-		
-		for player in affiliation_node.players:
-			successor.players.append(player)
-		
-		affiliations.erase(affiliation_node)
-		
-		affiliation_node.queue_free()
+	var i_to_move_to:int = 1 if i_to_delete == 0 else i_to_delete - 1;
+	
+	var successor:Affiliation = affiliations[i_to_move_to]
+	
+	for player in affiliation_node.players:
+		assign_player_to_affiliation(player, successor)
+	
+	affiliations.erase(affiliation_node)
+	
+	affiliation_node.queue_free()
+	
+	print("i_to_move_to: " + str(i_to_move_to))
+	print("i_to_delete: " + str(i_to_delete))
+	
+	emit_signal("lobby_ui_update")
 
 # Remove a player from the global list and free it
 remote func remove_player(id:int) -> void:
@@ -117,6 +123,8 @@ remote func remove_player(id:int) -> void:
 	player.affiliation.players.erase(player)
 	player.queue_free()
 	player_info[id] = null
+	
+	emit_signal("lobby_ui_update")
 
 # Start the game scene with the terrain, freeing the lobby UI
 remote func start_game():
