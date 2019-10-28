@@ -21,9 +21,9 @@ func _ready():
 	
 	build_ui()
 
-func set_color_rect_from_hue(hue:float) -> void:
+func set_color_rect_from_hue(hue:float, color_rect:ColorRect) -> void:
 	var color:Color = Color.from_hsv(hue, 0.75, 1)
-	color_rect
+	color_rect.color = color
 
 # Builds the entire lobby UI. Called whenever there is an update to affiliation / player structure
 # TODO: Figure out how "connect" interacts with networking. The calls from the UI connections
@@ -61,7 +61,7 @@ func build_ui() -> void:
 		var color_slider:HSlider = color_rect.get_child(0) # TODO: Only show slider when color_rect is clicked
 		color_slider.value = affiliation.color.h
 		assert(color_slider.connect("value_changed", affiliation, "set_color_from_hue") == OK)
-		assert(color_slider.connect("value_changed", self, "set_color_rect_from_hue") == OK)
+		assert(color_slider.connect("value_changed", self, "set_color_rect_from_hue", [color_rect]) == OK)
 		
 		var join_button:Button = new_affiliation_item.get_child(2)
 		assert(join_button.connect("pressed", main, "rpc_assign_player_to_affiliation", 
