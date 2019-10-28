@@ -4,7 +4,7 @@ class_name Affiliation
 
 # ID / Color
 var id:String = ""
-var color: Color = Color(0.0, 0.0, 0.0, 1.0)
+var color:Color = Color(0.0, 0.0, 0.0, 1.0)
 
 # Resource Counts
 var resource_1:float = 0
@@ -27,8 +27,12 @@ func _ready():
 func _process(delta):
 	pass
 
-sync func set_color(color:Color):
+func set_color_from_hue(hue:float) -> void:
+	var color:Color = Color.from_hsv(hue, 0.75, 1)
+	set_color(color)
+
+remote func set_color(color:Color) -> void:
 	self.color = color
 
-sync func set_id(id:String):
+sync func set_id(id:String) -> void:
 	self.id = id

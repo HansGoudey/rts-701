@@ -1,5 +1,8 @@
 extends Node
 
+# TODO: Add the rest of the rpc_* functions where there needed (used for calling from signals like from LobbyUI)
+# TODO: See if it's possible to move the player and affiliation functions to their respective scripts
+
 class_name Main
 
 const SERVER_PORT:int = 56789
@@ -36,6 +39,10 @@ func check_game_start_lobby() -> void:
 	if all_players_ready:
 		start_game()
 		rpc("start_game")
+		
+func rpc_assign_player_to_affiliation(player:Player, affiliation:Affiliation) -> void:
+	assign_player_to_affiliation(player, affiliation)
+	rpc("assign_player_to_affiliation", player, affiliation)
 
 remote func assign_player_to_affiliation(player:Player, affiliation:Affiliation) -> void:
 	# Remove this player from the affiliation its current one
@@ -68,6 +75,10 @@ remote func add_player(peer_id:int, affiliation:Affiliation, id:String) -> Playe
 
 	emit_signal("lobby_ui_update")
 	return player_node
+	
+func rpc_add_affiliation(color:Color, id:String) -> Affiliation:
+	rpc("add_affiliation", color, id)
+	return add_affiliation(color, id)
 
 remote func add_affiliation(color:Color, id:String) -> Affiliation:
 	print("Add Affiliation")
@@ -84,6 +95,10 @@ remote func add_affiliation(color:Color, id:String) -> Affiliation:
 remote func remove_affiliation_string(name:String) -> void:
 	var affiliation_node:Affiliation = find_node(name, false, true)
 	remove_affiliation(affiliation_node)
+
+func rpc_remove_affiliation(affiliation:Affiliation) -> void:
+	remove_affiliation(affiliation)
+	rpc("remove_affiliation", affiliation)
 
 remote func remove_affiliation(affiliation_node:Affiliation) -> void:
 	# Ensure node is found and is an existing Affiliation
@@ -111,9 +126,6 @@ remote func remove_affiliation(affiliation_node:Affiliation) -> void:
 	affiliations.erase(affiliation_node)
 	
 	affiliation_node.queue_free()
-	
-	print("i_to_move_to: " + str(i_to_move_to))
-	print("i_to_delete: " + str(i_to_delete))
 	
 	emit_signal("lobby_ui_update")
 

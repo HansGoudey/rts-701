@@ -52,10 +52,18 @@ text = "Affiliation"
 valign = 1
 
 [node name="Color" type="ColorRect" parent="AffiliationItem"]
-margin_left = 390.226
-margin_top = 17.4839
-margin_right = 421.226
-margin_bottom = 48.4839
+margin_left = 383.784
+margin_top = 14.7248
+margin_right = 426.784
+margin_bottom = 57.7248
+
+[node name="ColorSlider" type="HSlider" parent="AffiliationItem/Color"]
+margin_left = 62.0403
+margin_top = 42.354
+margin_right = 234.04
+margin_bottom = 58.354
+max_value = 1.0
+step = 0.0
 
 [node name="Join" type="Button" parent="AffiliationItem"]
 margin_left = 326.275

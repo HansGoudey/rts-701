@@ -21,9 +21,16 @@ func _ready():
 	
 	build_ui()
 
+func set_color_rect_from_hue(hue:float) -> void:
+	var color:Color = Color.from_hsv(hue, 0.75, 1)
+	color_rect
+
 # Builds the entire lobby UI. Called whenever there is an update to affiliation / player structure
 # TODO: Figure out how "connect" interacts with networking. The calls from the UI connections
 #       should happen on all clients with RPC
+# TODO: Lobby UI should really be built by keeping the ui elements for affiliations around with them rather
+#       than rebuilding it every time, so it would stay more consistent during editing, but this isn't 
+#       high priority
 func build_ui() -> void:
 	var screen_height:float = get_viewport().size.y
 	var y:float = screen_height * 0.05
@@ -47,15 +54,21 @@ func build_ui() -> void:
 		# Match UI to the this affiliation's values
 		var label:Label = new_affiliation_item.get_child(0)
 		label.text = affiliation.id
+		
 		var color_rect:ColorRect = new_affiliation_item.get_child(1)
 		color_rect.color = affiliation.color
+		
+		var color_slider:HSlider = color_rect.get_child(0) # TODO: Only show slider when color_rect is clicked
+		color_slider.value = affiliation.color.h
+		assert(color_slider.connect("value_changed", affiliation, "set_color_from_hue") == OK)
+		assert(color_slider.connect("value_changed", self, "set_color_rect_from_hue") == OK)
+		
 		var join_button:Button = new_affiliation_item.get_child(2)
-		# TODO: This connection might be a little hacky
-		assert(join_button.connect("pressed", main, "assign_player_to_affiliation", 
+		assert(join_button.connect("pressed", main, "rpc_assign_player_to_affiliation", 
 									[main.get_player(get_tree().get_network_unique_id()), affiliation]) == OK)
+									
 		var delete_button:Button = new_affiliation_item.get_child(3)
-		# TODO: This connection might be a little hacky
-		assert(delete_button.connect("pressed", main, "remove_affiliation", [affiliation]) == OK)
+		assert(delete_button.connect("pressed", main, "rpc_remove_affiliation", [affiliation]) == OK)
 		
 		# Add subsequent elements are further down
 		y += new_affiliation_item.rect_size.y
