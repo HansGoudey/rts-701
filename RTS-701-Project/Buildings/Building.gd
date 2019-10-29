@@ -8,7 +8,7 @@ var production_countdown: float = 0
 var production_active: bool = 0
 
 func _ready():
-	initialize_health()
+	pass
 
 func _process(delta):
 	# TODO: Use a timer
@@ -20,7 +20,4 @@ func _process(delta):
 # Functions to be over
 
 func production_finished() -> void:
-	pass
-	
-func initialize_health() -> void:
 	pass

@@ -14,19 +14,40 @@ enum DamageTypes {DMG_SPASH = 0, DMG_DIRECT = 1, DMG_MELEE = 2}
 var damage_type_multipliers = []
 
 # Resources
+# warning-ignore:unused_class_variable
 var cost = []
 
 func _ready():
+	add_entity()
+	rpc("add_entity")
+	
+remote func add_entity(): 
 	affiliation = self.get_parent()
+	set_cost()
+	for i in range(affiliation.resources.size()):
+		affiliation.change_resource(i, cost[i])
+	initialize_health()
 
-func _process(delta):
-	pass
+#func _process(delta):
+#	pass
 
-func damage(health:int, type:int):
+func change_health(health:int, type:int):
 	self.health -= health * damage_type_multipliers[type]
 	
 	if health < 0:
+		die()
 		self.free()
-		
-func _exit_tree():
+	elif health > maximum_health:
+		# Special behaviour when over maximum health?
+		pass
+
+# Override methods for functionality specific to specific types of entities
+
+func set_cost() -> void:
+	pass
+
+func initialize_health() -> void:
+	pass
+
+func die() -> void:
 	pass

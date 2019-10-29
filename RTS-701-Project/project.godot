@@ -32,7 +32,7 @@ _global_script_classes=[ {
 "base": "Node",
 "class": "Order",
 "language": "GDScript",
-"path": "res://Order.gd"
+"path": "res://Orders/Order.gd"
 }, {
 "base": "Node",
 "class": "Player",

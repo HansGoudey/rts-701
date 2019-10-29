@@ -16,7 +16,7 @@ signal lobby_ui_update
 
 func _ready():
 	# Load start UI and connect its signals
-	var ui_scene = load("res://StartUI.tscn")
+	var ui_scene = load("res://UI/StartUI.tscn")
 	var ui_node:Control = ui_scene.instance()
 	add_child(ui_node)
 	assert(ui_node.connect("host_game", self, "host_game") == OK)
@@ -154,7 +154,7 @@ remote func start_game():
 # Start the lobby scene to set up the game, freeing the start UI
 func start_lobby():
 	# Load lobby scene
-	var lobby_scene = load("res://LobbyUI.tscn")
+	var lobby_scene = load("res://UI/LobbyUI.tscn")
 	var lobby_node = lobby_scene.instance()
 	add_child(lobby_node)
 	$StartUI.queue_free()
@@ -186,12 +186,22 @@ func join_game() -> void:
 	var server_ip:String = ip_field.text
 
 	# Create the network peer as a client
+	var tree:SceneTree = get_tree()
+	if tree.has_network_peer():
+		tree.set_network_peer(null)
+	
 	var peer:NetworkedMultiplayerPeer = NetworkedMultiplayerENet.new()
-	peer.create_client(server_ip, SERVER_PORT)
-	get_tree().set_network_peer(peer)
-	self_id = get_tree().get_network_unique_id()
-
-	start_lobby()
+	var error:int = peer.create_client(server_ip, SERVER_PORT)
+	if error == OK:
+		tree.set_network_peer(peer)
+		self_id = tree.get_network_unique_id()
+		start_lobby()
+	elif error == ERR_ALREADY_IN_USE:
+		print("Network peer already in use, retrying")
+		peer.close_connection()
+		join_game()
+	elif error == ERR_CANT_CREATE:
+		print("Can't create connection")
 
 func network_peer_connected(id):
 	if get_tree().is_network_server():
