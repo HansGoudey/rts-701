@@ -10,5 +10,8 @@ export_presets.cfg
 # Blender Temporary Files
 *.blend1
 
+# Krita Temporary Files
+*.kra~
+
 # Mac Folder Files
 .DS_Store
