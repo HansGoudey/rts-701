@@ -6,19 +6,24 @@ class_name Entity
 var affiliation: Affiliation
 
 # Health
-var health: int = 0
-var maximum_health: int = 0
+var health:int = 0
+var maximum_health:int = 0
 
-# Called when the node enters the scene tree for the first time.
+# Damage
+enum DamageTypes {DMG_SPASH = 0, DMG_DIRECT = 1, DMG_MELEE = 2}
+var damage_type_multipliers = []
+
+# Resources
+var cost = []
+
 func _ready():
 	affiliation = self.get_parent()
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	pass
 
-func damage(health:int, type):
-	self.health -= health
+func damage(health:int, type:int):
+	self.health -= health * damage_type_multipliers[type]
 	
 	if health < 0:
 		self.free()

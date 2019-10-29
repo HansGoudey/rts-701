@@ -81,7 +81,6 @@ func rpc_add_affiliation(color:Color, id:String) -> Affiliation:
 	return add_affiliation(color, id)
 
 remote func add_affiliation(color:Color, id:String) -> Affiliation:
-	print("Add Affiliation")
 	var affiliation_scene = load("res://Affiliation.tscn")
 	var affiliation_node:Affiliation = affiliation_scene.instance()
 	affiliations.append(affiliation_node)
