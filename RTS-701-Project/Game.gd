@@ -1,7 +1,6 @@
 extends Spatial
 
 # Affiliations
-var n_affiliations: int = 0
 var affiliations = []
 
 func _ready():

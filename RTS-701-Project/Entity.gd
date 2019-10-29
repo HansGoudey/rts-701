@@ -17,6 +17,9 @@ var damage_type_multipliers = []
 # warning-ignore:unused_class_variable
 var cost = []
 
+# Selection by Player
+var selected:bool = false
+
 func _ready():
 	add_entity()
 	rpc("add_entity")

@@ -16,9 +16,7 @@ var players = []
 # Visible Area (Fog of war)
 
 func _ready():
-	var player_scene = load("res://Player.tscn")
-	var player_node = player_scene.instance()
-	add_child(player_node)
+	pass
 
 #func _process(delta):
 #	pass

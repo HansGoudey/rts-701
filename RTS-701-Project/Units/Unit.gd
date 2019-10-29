@@ -27,3 +27,6 @@ func set_cost():
 	# TODO: Use global for entire game to define the number of resources
 	for i in range(affiliation.resources.size()):
 		cost[i] = 10
+		
+remote func add_navigation_order():
+	pass

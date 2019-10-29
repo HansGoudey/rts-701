@@ -54,7 +54,7 @@ remote func assign_player_to_affiliation(player:Player, affiliation:Affiliation)
 	affiliation.players.append(player)
 	affiliation.add_child(player)
 	player.affiliation = affiliation
-	
+	player.assign_count += 1
 	emit_signal("lobby_ui_update")
 
 # Return the player node associated with a network peer ID

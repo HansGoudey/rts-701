@@ -7,12 +7,14 @@ A player corresponds to a human interacting with an affiliation. It will always
 be the child of an 'Affiliation' node.
 """
 
+var assign_count:int = 0
+
 # Name for UI (not the name of the node)
 # warning-ignore:unused_class_variable
 var id:String = ""
 
 # Affiliation (should be the parent of this node)
-var affiliation:Affiliation = null
+var affiliation:Affiliation
 
 # Lobby Information
 var ready_to_start:bool = false
@@ -177,3 +179,10 @@ func _unhandled_input(event:InputEvent):
 						select_entity()
 					mouse_drag = false
 					mouse_drag_time = 0
+			elif event.button_index == BUTTON_RIGHT:
+				if selected_entities.size() > 0:
+					for entity in selected_entities:
+						if entity is Unit:
+							var unit:Unit = entity as Unit
+							
+							unit.add_navigation_order()
