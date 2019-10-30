@@ -23,8 +23,8 @@ var selected:bool = false
 func _ready():
 	add_entity()
 	rpc("add_entity")
-	
-remote func add_entity(): 
+
+remote func add_entity():
 	affiliation = self.get_parent()
 	set_cost()
 	for i in range(affiliation.resources.size()):
@@ -36,7 +36,7 @@ remote func add_entity():
 
 func change_health(health:int, type:int):
 	self.health -= health * damage_type_multipliers[type]
-	
+
 	if health < 0:
 		die()
 		self.free()

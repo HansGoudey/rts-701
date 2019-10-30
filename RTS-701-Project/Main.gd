@@ -31,7 +31,7 @@ func _ready():
 	assert(get_tree().connect("connection_failed", self, "_connected_fail") == OK)
 	assert(get_tree().connect("server_disconnected", self, "_server_disconnected") == OK)
 
-# In the lobby, start the game if all players are ready 
+# In the lobby, start the game if all players are ready
 func check_game_start_lobby() -> void:
 	var all_players_ready:bool = true
 	for player_node in player_info.values():
@@ -41,7 +41,7 @@ func check_game_start_lobby() -> void:
 	if all_players_ready:
 		start_game()
 		rpc("start_game")
-		
+
 func rpc_assign_player_to_affiliation(player:Player, affiliation:Affiliation) -> void:
 	assign_player_to_affiliation(player, affiliation)
 	rpc("assign_player_to_affiliation", player, affiliation)
@@ -49,12 +49,12 @@ func rpc_assign_player_to_affiliation(player:Player, affiliation:Affiliation) ->
 remote func assign_player_to_affiliation(player:Player, affiliation:Affiliation) -> void:
 	print("Assign Player to Affiliation")
 	# Remove this player from the affiliation its current one
-	if player.affiliation: 
+	if player.affiliation:
 		player.affiliation.players.erase(player)
 		player.affiliation.remove_child(player)
 
 	# Add the player to the specified affiliation
-	affiliation.players.append(player)
+	affiliation.add_player(player)
 	affiliation.add_child(player)
 	player.affiliation = affiliation
 	player.assign_count += 1
@@ -79,7 +79,7 @@ remote func add_player(peer_id:int, affiliation:Affiliation, id:String) -> Playe
 
 	emit_signal("lobby_ui_update")
 	return player_node
-	
+
 func rpc_add_affiliation(color:Color, id:String) -> Affiliation:
 	rpc("add_affiliation", color, id)
 	return add_affiliation(color, id)
@@ -92,10 +92,11 @@ remote func add_affiliation(color:Color, id:String) -> Affiliation:
 	affiliation_node.set_network_master(1)
 	affiliation_node.id = id
 	affiliation_node.color = color
+	add_child(affiliation_node) # Add the affiliations as a child of Main for now, transfer them to Game later
 
 	emit_signal("lobby_ui_update")
 	return affiliation_node
-	
+
 remote func remove_affiliation_string(name:String) -> void:
 	var affiliation_node:Affiliation = find_node(name, false, true)
 	remove_affiliation(affiliation_node)
@@ -113,25 +114,25 @@ remote func remove_affiliation(affiliation_node:Affiliation) -> void:
 		return
 	if affiliations.size() == 1: # Do not allow deleting the last affiliation
 		return
-		
-	# Find the affiliation in the list 
+
+	# Find the affiliation in the list
 	var i_to_delete:int = 0
 	for i in range(affiliations.size()):
 		if affiliations[i] == affiliation_node:
 			i_to_delete = i # location of the affiliation to delete in list
 			break
-		
+
 	var i_to_move_to:int = 1 if i_to_delete == 0 else i_to_delete - 1;
-	
+
 	var successor:Affiliation = affiliations[i_to_move_to]
-	
+
 	for player in affiliation_node.players:
 		assign_player_to_affiliation(player, successor)
-	
+
 	affiliations.erase(affiliation_node)
-	
+
 	affiliation_node.queue_free()
-	
+
 	emit_signal("lobby_ui_update")
 
 # Remove a player from the global list and free it
@@ -141,7 +142,7 @@ remote func remove_player(id:int) -> void:
 	player.affiliation.players.erase(player)
 	player.queue_free()
 	player_info[id] = null
-	
+
 	emit_signal("lobby_ui_update")
 
 # Start the game scene with the terrain, freeing the lobby UI
@@ -155,7 +156,7 @@ remote func start_game():
 	# Pass the affiliations and players list to the game
 	game_node.affiliations = self.affiliations.duplicate()
 	self.affiliations = null
-	
+
 	game_node.start_game()
 
 # Start the lobby scene to set up the game, freeing the start UI
@@ -199,7 +200,7 @@ func join_game() -> void:
 	var tree:SceneTree = get_tree()
 	if tree.has_network_peer():
 		tree.set_network_peer(null)
-	
+
 	var peer:NetworkedMultiplayerPeer = NetworkedMultiplayerENet.new()
 	var error:int = peer.create_client(server_ip, SERVER_PORT)
 	if error == OK:

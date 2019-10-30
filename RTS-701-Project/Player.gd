@@ -41,7 +41,7 @@ var camera_velocity:Vector3 = Vector3(0, 0, 0)
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	camera = get_node("Camera")
-	
+
 func camera_movement(delta:float):
 	var camera_acceleration: float = 1
 	if Input.is_action_pressed("camera_right"):
@@ -56,7 +56,7 @@ func camera_movement(delta:float):
 		camera_velocity.y += delta * camera_acceleration
 	if Input.is_action_pressed("camera_down"):
 		camera_velocity.y -= delta * camera_acceleration
-	
+
 	# Smoothly lower the camera velocity
 	camera_velocity *= 0.95
 
@@ -78,10 +78,10 @@ func select_entity():
 			var entity:Entity = child as Entity
 			if entity.get_translation().distance_to(selection_point) < closest_distance:
 				closest_entity = entity
-	
+
 	# Check for no entities found and create selection
 	if not closest_entity:
-		return	 
+		return
 	if Input.is_key_pressed(KEY_SHIFT):
 		selected_entities += [closest_entity] # TODO: Does this concatonate arrays??
 	else:
@@ -94,7 +94,7 @@ static func isect_line_plane_v3(l1:Vector3, l2:Vector3, plane_co:Vector3, plane_
 	var u:Vector3 = l2 - l1
 	var h:Vector3 = l1 - plane_co
 	var dot:float = plane_no.dot(u)
-	
+
 	if abs(dot) > 0.0000001:
 		var lambda:float = - (plane_no.dot(h) / dot)
 		return l1 + u * lambda
@@ -105,7 +105,7 @@ func project_mouse_to_terrain_plane() -> Vector3:
 	var mouse_position:Vector2 = get_viewport().get_mouse_position()
 	var from:Vector3 = camera.project_ray_origin(mouse_position)
 	var to:Vector3 = from + camera.project_ray_normal(mouse_position)
-	
+
 	# TODO: Use a raycast to intersect with terrain instead of the y = 0 plane
 	return isect_line_plane_v3(to, from, Vector3(0, 0, 0), Vector3(0, 1, 0))
 
@@ -117,7 +117,7 @@ func start_box_select():
 func handle_box_select():
 	# Raycast to the terrain to get the second box select location
 	box_select_end = project_mouse_to_terrain_plane()
-	
+
 	# Then find all of the entities within the box
 	for child in affiliation.get_children():
 		if child is Entity:
@@ -134,17 +134,17 @@ func handle_box_select():
 			else:
 				if not (child.translation.y < box_select_start.y and child.translation.y > box_select_end.y):
 					continue
-			
+
 			# If we're still in this iteration the entity is in the box, so append it
 			box_entities.append(child)
-	
+
 func end_box_select():
 	# Replace the selection or add it to the current selection depending on modifier keys
 	if Input.is_key_pressed(KEY_SHIFT):
 		selected_entities += box_entities # TODO: Does this concatonate arrays??
 	else:
 		selected_entities = box_entities.duplicate()
-	
+
 	# We're done with the box select entities array now
 	box_entities.clear()
 
@@ -184,5 +184,5 @@ func _unhandled_input(event:InputEvent):
 					for entity in selected_entities:
 						if entity is Unit:
 							var unit:Unit = entity as Unit
-							
+
 							unit.add_navigation_order()

@@ -30,7 +30,13 @@ remote func set_color(color:Color) -> void:
 
 sync func set_id(id:String) -> void:
 	self.id = id
-	
+
 remote func change_resource(which:int, amount:float) -> void:
 	assert(which < resources.size())
 	resources[which] += amount
+
+func add_player(player):
+	if players:
+		players.append(player)
+	else:
+		players = [player]
