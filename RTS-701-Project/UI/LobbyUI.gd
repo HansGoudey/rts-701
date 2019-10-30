@@ -26,8 +26,6 @@ func set_color_rect_from_hue(hue:float, color_rect:ColorRect) -> void:
 	color_rect.color = color
 
 # Builds the entire lobby UI. Called whenever there is an update to affiliation / player structure
-# TODO: Figure out how "connect" interacts with networking. The calls from the UI connections
-#       should happen on all clients with RPC
 # TODO: Lobby UI should really be built by keeping the ui elements for affiliations around with them rather
 #       than rebuilding it every time, so it would stay more consistent during editing, but this isn't 
 #       high priority

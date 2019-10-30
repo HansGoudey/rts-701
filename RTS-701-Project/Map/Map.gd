@@ -5,7 +5,7 @@ var navmesh_id:int = 0
 
 func _ready():
 	# Add the terrain
-	var terrain_file = load("res://Map/SimpleTerrain.glb")
+	var terrain_file = preload("res://Map/SimpleTerrain.glb")
 	var terrain_node = terrain_file.instance()
 	add_child(terrain_node)
 	var terrain_mesh_instance:MeshInstance = terrain_node.get_child(0)

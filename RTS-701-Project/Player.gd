@@ -60,7 +60,7 @@ func camera_movement(delta:float):
 	# Smoothly lower the camera velocity
 	camera_velocity *= 0.95
 
-	camera.translate(camera_velocity)
+	camera.translation += camera_velocity
 	rset_unreliable("camera.translation", camera.translation)
 
 func set_lobby_ready(ready:bool) -> void:
