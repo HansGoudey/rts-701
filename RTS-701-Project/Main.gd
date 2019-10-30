@@ -23,7 +23,7 @@ func _ready():
 	add_child(ui_node)
 	assert(ui_node.connect("host_game", self, "host_game") == OK)
 	assert(ui_node.connect("join_game", self, "join_game") == OK)
-
+	
 	# Connect networking functions
 	assert(get_tree().connect("network_peer_connected", self, "network_peer_connected") == OK)
 	assert(get_tree().connect("network_peer_disconnected", self, "_player_disconnected") == OK)
@@ -71,7 +71,7 @@ remote func add_player(peer_id:int, affiliation:Affiliation, id:String) -> Playe
 	var player_node:Player = player_scene.instance()
 	player_node.set_name("Player" + str(peer_id))
 	player_node.set_network_master(peer_id)
-	player_node.id = id
+	player_node.id = id	
 	assign_player_to_affiliation(player_node, affiliation)
 
 	player_info[id] = player_node

@@ -38,9 +38,29 @@ var selected_entities = []
 var camera:Camera
 var camera_velocity:Vector3 = Vector3(0, 0, 0)
 
+# Creating a new building
+var building_pos: Vector3 = Vector3(0, 0, 0)
+var create_building: bool = false
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	camera = get_node("Camera")
+	# Load UI
+	var ui_scene = load("res://UI/GameUI.tscn")
+	var ui_node:Control = ui_scene.instance()
+	add_child(ui_node)
+	ui_node.connect("place_building", self, "place_building_down")
+	assert(ui_node.connect("place_entity", self, "place_entity_down") == OK)
+		
+func place_building_down():
+	create_building = true
+
+func create_building():
+	print("creating")
+	var building_scene = load("res://Buildings/Basic.glb")
+	var building_node = building_scene.instance()
+	building_node.translate(project_mouse_to_terrain_plane())
+	add_child(building_node)
 
 func camera_movement(delta:float):
 	var camera_acceleration: float = 1
@@ -162,13 +182,16 @@ func _unhandled_input(event:InputEvent):
 			if event.button_index == BUTTON_LEFT:
 				if event.pressed:
 					# Mouse just pressed or has been pressed
-					mouse_down_left = true
-					if mouse_drag:
-						pass
-					elif mouse_drag_time > DRAG_START_TIME:
-						# Start mouse drag after holding it down for enough time
-						mouse_drag = true
-						start_box_select()
+					if create_building:
+						create_building()
+					else:
+						mouse_down_left = true
+						if mouse_drag:
+							pass
+						elif mouse_drag_time > DRAG_START_TIME:
+							# Start mouse drag after holding it down for enough time
+							mouse_drag = true
+							start_box_select()
 				else:
 					# Mouse just released
 					mouse_down_left = false
