@@ -214,6 +214,10 @@ func join_game() -> void:
 		join_game()
 	elif error == ERR_CANT_CREATE:
 		print("Can't create connection")
+		
+remote func add_player_and_affiliation():
+	var new_affiliation:Affiliation = add_affiliation(Color(randf(), randf(), randf()), "New Affiliation")
+	add_player(self_id, new_affiliation, player_name_from_title)
 
 func network_peer_connected(id):
 	print("Network Peer Connected")
@@ -228,12 +232,9 @@ func network_peer_connected(id):
 						var player = child as Player
 						rpc_id(id, "add_player", player.get_network_master(), player.affiliation, player.id)
 	else:
-		# Add a new player for the player that just joined
-		var new_affiliation:Affiliation = add_affiliation(Color(randf(), randf(), randf()), "New Affiliation")
-		rpc("add_affiliation", Color(randf(), randf(), randf()), "New Affiliation")
-		# warning-ignore:return_value_discarded
-		add_player(self_id, new_affiliation, player_name_from_title)
-		rpc("add_player", self_id, new_affiliation, player_name_from_title)
+		# Add a new player and a new affiliation for the person that just joined
+		add_player_and_affiliation()
+		rpc("add_player_and_affiliation")
 		connected_success = true
 
 func network_peer_disconnected(id):
