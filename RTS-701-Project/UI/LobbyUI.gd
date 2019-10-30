@@ -33,6 +33,10 @@ func build_ui() -> void:
 	var screen_height:float = get_viewport().size.y
 	var y:float = screen_height * 0.05
 	
+	# Don't try to draw the UI if we haven't connected to the server yet
+	if not get_tree().is_network_server() and not main.connected_success:
+		return
+
 	# Delete all of the UI elements from the last time it was drawn
 	for panel in last_ui_build:
 		panel.queue_free()

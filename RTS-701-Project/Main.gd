@@ -11,7 +11,9 @@ const MAX_PLAYERS:int = 10
 # Lobby Networking Information
 var self_id:int = 0
 var player_info = {} # {id: Player node}
-var affiliations = [] # Only used during lobby phase, game stores
+var player_name_from_title:String = ""
+var affiliations = [] # Only used during lobby phase, Game stores them after that
+var connected_success: bool = false
 signal lobby_ui_update
 
 func _ready():
@@ -164,9 +166,11 @@ func start_lobby():
 	add_child(lobby_node)
 	$StartUI.queue_free()
 
-func get_start_ui_player_name() -> String:
+# In some cases the text box used to set the name is freed before we create the player,
+# so store the name in a variable temporarily so we can use it
+func get_start_ui_player_name() -> void:
 	var name_field:TextEdit = $StartUI/NameField
-	return name_field.text
+	player_name_from_title = name_field.text
 
 func host_game() -> void:
 	# Create the network peer as a server
@@ -179,7 +183,8 @@ func host_game() -> void:
 	var affiliation:Affiliation = add_affiliation(Color(1, 0, 0), "Affiliation 1")
 
 	# Add player and add it to the affiliation
-	var player:Player = add_player(1, affiliation, get_start_ui_player_name())
+	get_start_ui_player_name()
+	var player:Player = add_player(1, affiliation, player_name_from_title)
 	player_info[1] = player
 
 	start_lobby()
@@ -200,6 +205,7 @@ func join_game() -> void:
 	if error == OK:
 		tree.set_network_peer(peer)
 		self_id = tree.get_network_unique_id()
+		get_start_ui_player_name()
 		start_lobby()
 	elif error == ERR_ALREADY_IN_USE:
 		print("Network peer already in use, retrying")
@@ -225,11 +231,12 @@ func network_peer_connected(id):
 		var new_affiliation:Affiliation = add_affiliation(Color(randf(), randf(), randf()), "New Affiliation")
 		rpc("add_affiliation", Color(randf(), randf(), randf()), "New Affiliation")
 		# warning-ignore:return_value_discarded
-		add_player(self_id, new_affiliation, get_start_ui_player_name())
-		rpc("add_player", self_id, new_affiliation, get_start_ui_player_name())
+		add_player(self_id, new_affiliation, player_name_from_title)
+		rpc("add_player", self_id, new_affiliation, player_name_from_title)
+		connected_success = true
 
 func network_peer_disconnected(id):
-	print ("Network Peer Disconnected")
+	print("Network Peer Disconnected")
 	remove_player(id)
 	if get_tree().is_network_server():
 		remove_player(id)
