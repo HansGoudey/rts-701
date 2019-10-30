@@ -45,6 +45,7 @@ func rpc_assign_player_to_affiliation(player:Player, affiliation:Affiliation) ->
 	rpc("assign_player_to_affiliation", player, affiliation)
 
 remote func assign_player_to_affiliation(player:Player, affiliation:Affiliation) -> void:
+	print("Assign Player to Affiliation")
 	# Remove this player from the affiliation its current one
 	if player.affiliation: 
 		player.affiliation.players.erase(player)
@@ -63,6 +64,7 @@ func get_player(id:int) -> Player:
 
 # Instance a player scene, map the network peer ID to it, and return it
 remote func add_player(peer_id:int, affiliation:Affiliation, id:String) -> Player:
+	print("Add Player")
 	var player_scene = load("res://Player.tscn")
 	var player_node:Player = player_scene.instance()
 	player_node.set_name("Player" + str(peer_id))
@@ -81,6 +83,7 @@ func rpc_add_affiliation(color:Color, id:String) -> Affiliation:
 	return add_affiliation(color, id)
 
 remote func add_affiliation(color:Color, id:String) -> Affiliation:
+	print("Add Affiliation")
 	var affiliation_scene = load("res://Affiliation.tscn")
 	var affiliation_node:Affiliation = affiliation_scene.instance()
 	affiliations.append(affiliation_node)
@@ -100,6 +103,7 @@ func rpc_remove_affiliation(affiliation:Affiliation) -> void:
 	rpc("remove_affiliation", affiliation)
 
 remote func remove_affiliation(affiliation_node:Affiliation) -> void:
+	print("Remove Affiliation")
 	# Ensure node is found and is an existing Affiliation
 	if not affiliation_node:
 		return
@@ -130,6 +134,7 @@ remote func remove_affiliation(affiliation_node:Affiliation) -> void:
 
 # Remove a player from the global list and free it
 remote func remove_player(id:int) -> void:
+	print("Remove Player")
 	var player:Player = get_player(id)
 	player.affiliation.players.erase(player)
 	player.queue_free()
@@ -204,6 +209,7 @@ func join_game() -> void:
 		print("Can't create connection")
 
 func network_peer_connected(id):
+	print("Network Peer Connected")
 	if get_tree().is_network_server():
 		# Set up the current tree for a newly joined player
 		for child in get_children():
@@ -223,6 +229,7 @@ func network_peer_connected(id):
 		rpc("add_player", self_id, new_affiliation, get_start_ui_player_name())
 
 func network_peer_disconnected(id):
+	print ("Network Peer Disconnected")
 	remove_player(id)
 	if get_tree().is_network_server():
 		remove_player(id)
