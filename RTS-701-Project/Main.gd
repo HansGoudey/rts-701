@@ -232,7 +232,7 @@ func network_peer_connected(id):
 				rpc_id(id, "add_affiliation", affiliation.color, affiliation.id)
 				for aff_child in affiliation.get_children():
 					if aff_child is Player:
-						var player = child as Player
+						var player = aff_child as Player
 						rpc_id(id, "add_player", player.get_network_master(), player.affiliation, player.id)
 	else:
 		# Add a new player and a new affiliation for the person that just joined
