@@ -38,9 +38,9 @@ var selected_entities = []
 var camera:Camera
 var camera_velocity:Vector3 = Vector3(0, 0, 0)
 
-# Creating a new building
-var building_pos: Vector3 = Vector3(0, 0, 0)
+# Creating a new building and unit
 var create_building: bool = false
+var create_unit:bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -50,10 +50,13 @@ func _ready():
 	var ui_node:Control = ui_scene.instance()
 	add_child(ui_node)
 	ui_node.connect("place_building", self, "place_building_down")
-	assert(ui_node.connect("place_entity", self, "place_entity_down") == OK)
+	assert(ui_node.connect("place_unit", self, "place_unit_down") == OK)
 		
 func place_building_down():
 	create_building = true
+
+func place_unit_down():
+	create_unit = true
 
 func create_building():
 	print("creating")
@@ -61,6 +64,16 @@ func create_building():
 	var building_node = building_scene.instance()
 	building_node.translate(project_mouse_to_terrain_plane())
 	add_child(building_node)
+	
+	create_building = false
+
+func create_unit():
+	var unit_scene = load("res://Units/Basic.glb")
+	var unit_node = unit_scene.instance()
+	unit_node.translate(project_mouse_to_terrain_plane())
+	add_child(unit_node)
+	
+	create_unit = false
 
 func camera_movement(delta:float):
 	var camera_acceleration: float = 1
@@ -176,7 +189,7 @@ func _process(delta):
 		if mouse_drag:
 			handle_box_select() # Put this here so the selection updates when there are no mouse events
 
-func _unhandled_input(event:InputEvent):
+func _input(event:InputEvent):
 	if self.is_network_master():
 		if event is InputEventMouseButton:
 			if event.button_index == BUTTON_LEFT:
@@ -184,6 +197,8 @@ func _unhandled_input(event:InputEvent):
 					# Mouse just pressed or has been pressed
 					if create_building:
 						create_building()
+					elif create_unit:
+						create_unit()
 					else:
 						mouse_down_left = true
 						if mouse_drag:
@@ -207,5 +222,4 @@ func _unhandled_input(event:InputEvent):
 					for entity in selected_entities:
 						if entity is Unit:
 							var unit:Unit = entity as Unit
-
 							unit.add_navigation_order()
