@@ -24,9 +24,9 @@ margin_right = 141.0
 margin_bottom = 31.0
 text = "Place Building"
 
-[node name="PlaceEntity" type="Button" parent="Actions"]
+[node name="PlaceUnit" type="Button" parent="Actions"]
 margin_left = 15.0
 margin_top = 38.0082
 margin_right = 141.0
 margin_bottom = 58.0082
-text = "Place Entity"
+text = "Place Unit"

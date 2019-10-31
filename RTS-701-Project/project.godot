@@ -66,6 +66,11 @@ config/name="RTS-701-Project"
 run/main_scene="res://Main.tscn"
 config/icon="res://icon.png"
 
+[display]
+
+window/size/width=1920
+window/size/height=1080
+
 [input]
 
 camera_right={
@@ -105,5 +110,4 @@ camera_down={
 
 [rendering]
 
-quality/directional_shadow/size=8192
 environment/default_environment="res://default_env.tres"

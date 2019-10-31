@@ -38,22 +38,27 @@ var selected_entities = []
 var camera:Camera
 var camera_velocity:Vector3 = Vector3(0, 0, 0)
 
-# Creating a new building
-var building_pos: Vector3 = Vector3(0, 0, 0)
-var create_building: bool = false
+# Creating a new building and unit
+var create_building:bool = false
+var create_unit:bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	camera = get_node("Camera")
-	# Load UI
+
+# Load UI when game is started
+func load_ui():
 	var ui_scene = load("res://UI/GameUI.tscn")
 	var ui_node:Control = ui_scene.instance()
 	add_child(ui_node)
 	ui_node.connect("place_building", self, "place_building_down")
-	assert(ui_node.connect("place_entity", self, "place_entity_down") == OK)
+	assert(ui_node.connect("place_unit", self, "place_unit_down") == OK)
 		
 func place_building_down():
 	create_building = true
+
+func place_unit_down():
+	create_unit = true
 
 func create_building():
 	print("creating")
@@ -61,6 +66,7 @@ func create_building():
 	var building_node = building_scene.instance()
 	building_node.translate(project_mouse_to_terrain_plane())
 	add_child(building_node)
+	create_building = false
 
 func camera_movement(delta:float):
 	var camera_acceleration: float = 1
@@ -183,6 +189,7 @@ func _unhandled_input(event:InputEvent):
 				if event.pressed:
 					# Mouse just pressed or has been pressed
 					if create_building:
+						print('Creating building')
 						create_building()
 					else:
 						mouse_down_left = true
