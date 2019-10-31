@@ -62,12 +62,13 @@ func build_ui() -> void:
 
 		var color_slider:HSlider = color_rect.get_child(0) # TODO: Only show slider when color_rect is clicked
 		color_slider.value = affiliation.color.h
-		assert(color_slider.connect("value_changed", affiliation, "set_color_from_hue") == OK)
+		assert(color_slider.connect("value_changed", affiliation, "rpc_set_color_from_hue") == OK)
 		assert(color_slider.connect("value_changed", self, "set_color_rect_from_hue", [color_rect]) == OK)
 
 		var join_button:Button = new_affiliation_item.get_child(2)
-		assert(join_button.connect("pressed", main, "rpc_assign_player_to_affiliation",
-								   [main.get_player(get_tree().get_network_unique_id()), affiliation]) == OK)
+		if get_tree().get_network_unique_id() in main.player_info.keys(): # Maybe player isn't added yet
+			assert(join_button.connect("pressed", main, "rpc_assign_player_to_affiliation",
+									   [main.get_player(get_tree().get_network_unique_id()), affiliation]) == OK)
 
 		var delete_button:Button = new_affiliation_item.get_child(3)
 		assert(delete_button.connect("pressed", main, "rpc_remove_affiliation", [affiliation]) == OK)

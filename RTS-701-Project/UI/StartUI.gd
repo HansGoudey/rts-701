@@ -9,6 +9,6 @@ signal join_game
 
 func _on_JoinButton_Pressed():
 	emit_signal("join_game")
-	
+
 func _on_HostButton_Pressed():
 	emit_signal("host_game")

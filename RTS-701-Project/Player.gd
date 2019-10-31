@@ -39,8 +39,8 @@ var camera:Camera
 var camera_velocity:Vector3 = Vector3(0, 0, 0)
 
 # Creating a new building and unit
-var create_building:bool = false
-var create_unit:bool = false
+var create_building_mode:bool = false
+var create_unit_mode:bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -53,12 +53,12 @@ func load_ui():
 	add_child(ui_node)
 	ui_node.connect("place_building", self, "place_building_down")
 	assert(ui_node.connect("place_unit", self, "place_unit_down") == OK)
-		
+
 func place_building_down():
-	create_building = true
+	create_building_mode = true
 
 func place_unit_down():
-	create_unit = true
+	create_unit_mode = true
 
 func create_building():
 	print("creating")
@@ -66,16 +66,16 @@ func create_building():
 	var building_node = building_scene.instance()
 	building_node.translate(project_mouse_to_terrain_plane())
 	add_child(building_node)
-	
-	create_building = false
+
+	create_building_mode = false
 
 func create_unit():
 	var unit_scene = load("res://Units/Basic.glb")
 	var unit_node = unit_scene.instance()
 	unit_node.translate(project_mouse_to_terrain_plane())
 	add_child(unit_node)
-	
-	create_unit = false
+
+	create_unit_mode = false
 
 func camera_movement(delta:float):
 	var camera_acceleration: float = 1
@@ -143,7 +143,7 @@ func project_mouse_to_terrain_plane() -> Vector3:
 
 	# TODO: Use a raycast to intersect with terrain instead of the y = 0 plane
 	var navigation_node:Navigation = get_node("/root/Main/Game/Map/Navigation")
-	
+
 	if navigation_node:
 		return navigation_node.get_closest_point_to_segment(from, to)
 	else:
@@ -202,10 +202,10 @@ func _input(event:InputEvent):
 			if event.button_index == BUTTON_LEFT:
 				if event.pressed:
 					# Mouse just pressed or has been pressed
-					if create_building:
-						print('Creating building')
+					if create_building_mode:
+
 						create_building()
-					elif create_unit:
+					elif create_unit_mode:
 						create_unit()
 					else:
 						mouse_down_left = true
