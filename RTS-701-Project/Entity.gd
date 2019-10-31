@@ -31,8 +31,10 @@ remote func add_entity():
 		affiliation.change_resource(i, cost[i])
 	initialize_health()
 
-#func _process(delta):
-#	pass
+func _process(delta):
+	if selected:
+		pass
+		# Show a difference
 
 func change_health(health:int, type:int):
 	self.health -= health * damage_type_multipliers[type]
