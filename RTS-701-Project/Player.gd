@@ -142,11 +142,11 @@ func project_mouse_to_terrain_plane() -> Vector3:
 	var to:Vector3 = from + camera.project_ray_normal(mouse_position) * 1000
 
 	# TODO: Use a raycast to intersect with terrain instead of the y = 0 plane
-	var navigation_node:Navigation = find_node("Navigation", true, false)
+	var navigation_node:Navigation = get_node("/root/Main/Game/Map/Navigation")
+	
 	if navigation_node:
 		return navigation_node.get_closest_point_to_segment(from, to)
 	else:
-		print("Didn't find navigation node: intersecting with y = 0")
 		return isect_line_plane_v3(to, from, Vector3(0, 0, 0), Vector3(0, 1, 0))
 
 func start_box_select():
