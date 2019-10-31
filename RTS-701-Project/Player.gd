@@ -66,7 +66,16 @@ func create_building():
 	var building_node = building_scene.instance()
 	building_node.translate(project_mouse_to_terrain_plane())
 	add_child(building_node)
+	
 	create_building = false
+
+func create_unit():
+	var unit_scene = load("res://Units/Basic.glb")
+	var unit_node = unit_scene.instance()
+	unit_node.translate(project_mouse_to_terrain_plane())
+	add_child(unit_node)
+	
+	create_unit = false
 
 func camera_movement(delta:float):
 	var camera_acceleration: float = 1
@@ -184,7 +193,7 @@ func _process(delta):
 		if mouse_drag:
 			handle_box_select() # Put this here so the selection updates when there are no mouse events
 
-func _unhandled_input(event:InputEvent):
+func _input(event:InputEvent):
 	if self.is_network_master():
 		if event is InputEventMouseButton:
 			if event.button_index == BUTTON_LEFT:
@@ -193,6 +202,8 @@ func _unhandled_input(event:InputEvent):
 					if create_building:
 						print('Creating building')
 						create_building()
+					elif create_unit:
+						create_unit()
 					else:
 						mouse_down_left = true
 						if mouse_drag:
@@ -216,5 +227,4 @@ func _unhandled_input(event:InputEvent):
 					for entity in selected_entities:
 						if entity is Unit:
 							var unit:Unit = entity as Unit
-
 							unit.add_navigation_order()
