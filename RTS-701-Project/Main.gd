@@ -222,12 +222,12 @@ func join_game() -> void:
 	elif error == ERR_CANT_CREATE:
 		print("Can't create connection")
 
-remote func add_player_and_affiliation(player_name_from_title:String):
+remote func add_player_and_affiliation(new_peer_id:int, player_name_from_title:String):
 	print("Add Player and Affiliation")
 	var new_affiliation:Affiliation = add_affiliation(Color(randf(), randf(), randf()), "New Affiliation")
-	add_player(self_id, new_affiliation, player_name_from_title)
+	add_player(new_peer_id, new_affiliation, player_name_from_title)
 
-func network_peer_connected(id):
+func network_peer_connected(new_peer_id):
 	print("Network Peer Connected")
 	if get_tree().is_network_server():
 		# Set up the current tree for a newly joined player
@@ -236,17 +236,17 @@ func network_peer_connected(id):
 			if child is Affiliation:
 				var affiliation = child as Affiliation
 				print("  Adding affiliation (ID: " + affiliation.id + ")")
-				rpc_id(id, "add_affiliation", affiliation.color, affiliation.id)
+				rpc_id(new_peer_id, "add_affiliation", affiliation.color, affiliation.id)
 				for aff_child in affiliation.get_children():
 					if aff_child is Player:
 						var player = aff_child as Player
 						assert(player.affiliation)
 						print("  Adding player (ID: " + player.id + ")")
-						rpc_id(id, "add_player", player.get_network_master(), player.affiliation, player.id)
+						rpc_id(new_peer_id, "add_player", player.get_network_master(), player.affiliation, player.id)
 	else:
 		# Add a new player and a new affiliation for the person that just joined
-		add_player_and_affiliation(player_name_from_title)
-		rpc("add_player_and_affiliation", player_name_from_title)
+		add_player_and_affiliation(new_peer_id, player_name_from_title)
+		rpc("add_player_and_affiliation", new_peer_id, player_name_from_title)
 		connected_success = true
 
 func network_peer_disconnected(id):
