@@ -66,7 +66,7 @@ func get_player(id:int) -> Player:
 
 # Instance a player scene, map the network peer ID to it, and return it
 remote func add_player(peer_id:int, affiliation:Affiliation, id:String) -> Player:
-	print("Add Player")
+	print("Add Player with ID ", id, " for ", peer_id, " to affiliation ID ", affiliation.id)
 	var player_scene = load("res://Player.tscn")
 	var player_node:Player = player_scene.instance()
 	player_node.set_name("Player" + str(peer_id))
@@ -74,7 +74,7 @@ remote func add_player(peer_id:int, affiliation:Affiliation, id:String) -> Playe
 	player_node.id = id
 	assign_player_to_affiliation(player_node, affiliation)
 
-	player_info[id] = player_node
+	player_info[peer_id] = player_node
 	assert(player_node.connect("ready_to_start", self, "check_game_start_lobby") == 0)
 
 	emit_signal("lobby_ui_update")
@@ -139,6 +139,9 @@ remote func remove_affiliation(affiliation_node:Affiliation) -> void:
 remote func remove_player(id:int) -> void:
 	print("Remove Player")
 	var player:Player = get_player(id)
+	if not player:
+		print("ERROR (remove_player): No player found with id ", id, "")
+		return
 	player.affiliation.players.erase(player)
 	player.queue_free()
 	player_info[id] = null
