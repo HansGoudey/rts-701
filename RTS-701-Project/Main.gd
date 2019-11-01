@@ -231,13 +231,17 @@ func network_peer_connected(id):
 	print("Network Peer Connected")
 	if get_tree().is_network_server():
 		# Set up the current tree for a newly joined player
+		print("  Giving new peer existing tree")
 		for child in get_children():
 			if child is Affiliation:
 				var affiliation = child as Affiliation
+				print("  Adding affiliation (ID: " + affiliation.id + ")")
 				rpc_id(id, "add_affiliation", affiliation.color, affiliation.id)
 				for aff_child in affiliation.get_children():
 					if aff_child is Player:
 						var player = aff_child as Player
+						assert(player.affiliation)
+						print("  Adding player (ID: " + player.id + ")")
 						rpc_id(id, "add_player", player.get_network_master(), player.affiliation, player.id)
 	else:
 		# Add a new player and a new affiliation for the person that just joined
