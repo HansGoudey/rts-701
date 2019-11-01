@@ -26,10 +26,10 @@ func _ready():
 
 	# Connect networking functions
 	assert(get_tree().connect("network_peer_connected", self, "network_peer_connected") == OK)
-	assert(get_tree().connect("network_peer_disconnected", self, "_player_disconnected") == OK)
-	assert(get_tree().connect("connected_to_server", self, "_connected_ok") == OK)
-	assert(get_tree().connect("connection_failed", self, "_connected_fail") == OK)
-	assert(get_tree().connect("server_disconnected", self, "_server_disconnected") == OK)
+	assert(get_tree().connect("network_peer_disconnected", self, "network_peer_disconnected") == OK)
+	assert(get_tree().connect("connected_to_server", self, "connected_to_server") == OK)
+	assert(get_tree().connect("connection_failed", self, "connection_failed") == OK)
+	assert(get_tree().connect("server_disconnected", self, "server_disconnected") == OK)
 
 # In the lobby, start the game if all players are ready
 func check_game_start_lobby() -> void:
@@ -147,6 +147,7 @@ remote func remove_player(id:int) -> void:
 
 # Start the game scene with the terrain, freeing the lobby UI
 remote func start_game():
+	print("Start Game")
 	# Load game scene
 	var game_scene = load("res://Game.tscn")
 	var game_node = game_scene.instance()
@@ -164,6 +165,7 @@ remote func start_game():
 
 # Start the lobby scene to set up the game, freeing the start UI
 func start_lobby():
+	print("Start Lobby")
 	# Load lobby scene
 	var lobby_scene = load("res://UI/LobbyUI.tscn")
 	var lobby_node = lobby_scene.instance()
@@ -177,6 +179,7 @@ func get_start_ui_player_name() -> void:
 	player_name_from_title = name_field.text
 
 func host_game() -> void:
+	print("Host Game")
 	# Create the network peer as a server
 	var peer:NetworkedMultiplayerPeer = NetworkedMultiplayerENet.new()
 	peer.create_server(SERVER_PORT, MAX_PLAYERS)
@@ -194,6 +197,7 @@ func host_game() -> void:
 	start_lobby()
 
 func join_game() -> void:
+	print("Join Game")
 	# Get IP to connect to from text field
 	var ui_node:Control = $StartUI
 	var ip_field:TextEdit = ui_node.find_node("IPField", false)
@@ -219,6 +223,7 @@ func join_game() -> void:
 		print("Can't create connection")
 
 remote func add_player_and_affiliation():
+	print("Add Player and Affiliation")
 	var new_affiliation:Affiliation = add_affiliation(Color(randf(), randf(), randf()), "New Affiliation")
 	add_player(self_id, new_affiliation, player_name_from_title)
 

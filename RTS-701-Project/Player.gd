@@ -51,7 +51,7 @@ func load_ui():
 	var ui_scene = load("res://UI/GameUI.tscn")
 	var ui_node:Control = ui_scene.instance()
 	add_child(ui_node)
-	ui_node.connect("place_building", self, "place_building_down")
+	assert(ui_node.connect("place_building", self, "place_building_down") == OK)
 	assert(ui_node.connect("place_unit", self, "place_unit_down") == OK)
 
 func place_building_down():
