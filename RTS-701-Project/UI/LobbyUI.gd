@@ -10,7 +10,7 @@ func _ready():
 
 	# Connect signals from the UI to the main scene
 	assert($NewAffiliation.connect("pressed", main, "add_affiliation",
-									[Color(randf(), randf(), randf()), "New Affiliation"]) == OK)
+									[Color(randf(), randf(), randf()), "New Affiliation", ""]) == OK)
 
 	# Theming
 	$AffiliationItem.add_color_override("Theme", Color(0.5, 0.5, 0.5, 0.75))
@@ -30,6 +30,7 @@ func set_color_rect_from_hue(hue:float, color_rect:ColorRect) -> void:
 #       than rebuilding it every time, so it would stay more consistent during editing, but this isn't
 #       high priority
 func build_ui() -> void:
+	print("Build UI")
 	var screen_height:float = get_viewport().size.y
 	var y:float = screen_height * 0.05
 

@@ -198,7 +198,7 @@ func _process(delta):
 		if mouse_drag:
 			handle_box_select() # Put this here so the selection updates when there are no mouse events
 
-func _input(event:InputEvent):
+func _unhandled_input(event:InputEvent):
 	if self.is_network_master():
 		if event is InputEventMouseButton:
 			if event.button_index == BUTTON_LEFT:

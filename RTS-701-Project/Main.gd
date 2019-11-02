@@ -297,6 +297,7 @@ func network_peer_disconnected(id):
 		rpc("remove_player", id)
 
 func connected_to_server():
+	connected_success = true
 	pass
 
 func connection_failed():
