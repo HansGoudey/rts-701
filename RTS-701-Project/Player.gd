@@ -7,8 +7,6 @@ A player corresponds to a human interacting with an affiliation. It will always
 be the child of an 'Affiliation' node.
 """
 
-var assign_count:int = 0
-
 # Name for UI (not the name of the node)
 var id:String = ""
 
@@ -95,6 +93,7 @@ func camera_movement(delta:float):
 		camera_velocity.y -= delta * camera_acceleration
 
 	# Smoothly lower the camera velocity
+	# TODO: This means the smoothness depends on the framerate. The delta should be incorporated here
 	camera_velocity *= 0.95
 
 	camera.translation += camera_velocity

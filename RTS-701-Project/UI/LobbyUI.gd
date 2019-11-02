@@ -9,8 +9,8 @@ func _ready():
 	assert(main.connect("lobby_ui_update", self, "build_ui") == OK)
 
 	# Connect signals from the UI to the main scene
-	assert($NewAffiliation.connect("pressed", main, "add_affiliation",
-									[Color(randf(), randf(), randf()), "New Affiliation", ""]) == OK)
+	assert($NewAffiliation.connect("pressed", main, "rpc_add_affiliation",
+									[Color(randf(), randf(), randf()), "New Affiliation"]) == OK)
 
 	# Theming
 	$AffiliationItem.add_color_override("Theme", Color(0.5, 0.5, 0.5, 0.75))
@@ -21,9 +21,8 @@ func _ready():
 
 	build_ui()
 
-func set_color_rect_from_hue(hue:float, color_rect:ColorRect) -> void:
-	var color:Color = Color.from_hsv(hue, 0.75, 1)
-	color_rect.color = color
+func update_color_rect(color_rect:ColorRect, affiliation:Affiliation) -> void:
+	color_rect.color = affiliation.color
 
 # Builds the entire lobby UI. Called whenever there is an update to affiliation / player structure
 # TODO: Lobby UI should really be built by keeping the ui elements for affiliations around with them rather
@@ -63,8 +62,7 @@ func build_ui() -> void:
 
 		var color_slider:HSlider = color_rect.get_child(0) # TODO: Only show slider when color_rect is clicked
 		color_slider.value = affiliation.color.h
-		assert(color_slider.connect("value_changed", affiliation, "rpc_set_color_from_hue") == OK)
-		assert(color_slider.connect("value_changed", self, "set_color_rect_from_hue", [color_rect]) == OK)
+		assert(affiliation.connect("color_updated", color_rect, "set_frame_color") == OK)
 
 		var join_button:Button = new_affiliation_item.get_child(2)
 		if get_tree().get_network_unique_id() in main.player_info.keys(): # Maybe player isn't added yet

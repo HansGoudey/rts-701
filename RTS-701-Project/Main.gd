@@ -68,7 +68,6 @@ remote func assign_player_to_affiliation(player_path:String, affiliation_path:St
 	affiliation.add_player(player)
 	affiliation.add_child(player)
 	player.affiliation = affiliation
-	player.assign_count += 1
 	emit_signal("lobby_ui_update")
 
 # Return the player node associated with a network peer ID
@@ -130,7 +129,7 @@ remote func add_affiliation(color:Color, id:String, name:String) -> Affiliation:
 	affiliation_node.color = color
 	if name != "":
 		affiliation_node.set_name(name)
-	add_child(affiliation_node, true) # Add the affiliations as a child of Main for now, transfer them to Game later
+	add_child(affiliation_node, true) # Add the affiliations as a child of Main
 
 	emit_signal("lobby_ui_update")
 	return affiliation_node
@@ -287,6 +286,7 @@ func network_peer_connected(new_peer_id):
 
 		# Add a new affiliation and player to the newly joined peer
 		var new_affiliation:Affiliation = rpc_add_affiliation(Color(randf(), randf(), randf()), "New Affiliation")
+		# warning-ignore:return_value_discarded
 		rpc_add_player(new_peer_id, new_affiliation, "TEMP ID")
 
 func network_peer_disconnected(id):
