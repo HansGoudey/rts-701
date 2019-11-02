@@ -65,11 +65,7 @@ func add_building():
 	create_building_mode = false
 
 func add_unit():
-	var unit_scene = load("res://Units/Basic.glb")
-	var unit_node = unit_scene.instance()
-	unit_node.translate(project_mouse_to_terrain_plane())
-	add_child(unit_node)
-
+	affiliation.rpc_add_unit(affiliation.UNIT_TYPE_BASIC, project_mouse_to_terrain_plane())
 	create_unit_mode = false
 
 remote func set_camera_translation(translation:Vector3):
