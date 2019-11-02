@@ -57,10 +57,12 @@ remote func assign_player_to_affiliation(player_path:String, affiliation_path:St
 	var player:Player = get_node(player_path)
 	var affiliation:Affiliation = get_node(affiliation_path)
 
+	if player.is_inside_tree():
+		player.get_parent().remove_child(player)
+
 	# Remove this player from the affiliation its current one
 	if player.affiliation:
 		player.affiliation.players.erase(player)
-		player.affiliation.remove_child(player)
 
 	# Add the player to the specified affiliation
 	affiliation.add_player(player)
@@ -94,6 +96,8 @@ remote func add_player(peer_id:int, affiliation_path:String, id:String) -> Playe
 	player_node.set_name("Player" + str(peer_id))
 	player_node.set_network_master(peer_id)
 	player_node.id = id
+
+	add_child(player_node) # Player needs to be part of the tree to have a path
 	assign_player_to_affiliation(player_node.get_path(), affiliation_path)
 
 	player_info[peer_id] = player_node
