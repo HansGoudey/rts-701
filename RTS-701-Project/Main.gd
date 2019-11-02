@@ -54,8 +54,8 @@ remote func assign_player_to_affiliation(player_path:String, affiliation_path:St
 	print("Assign Player to Affiliation")
 
 	# Get the nodes from the paths
-	var player:Player = $player_path
-	var affiliation:Affiliation = $affiliation_path
+	var player:Player = get_node(player_path)
+	var affiliation:Affiliation = get_node(affiliation_path)
 
 	# Remove this player from the affiliation its current one
 	if player.affiliation:
@@ -85,7 +85,7 @@ func rpc_add_player(peer_id:int, affiliation:Affiliation, id:String) -> Player:
 # Doesn't contain a 'name' argument because the unique peer ID is appended to the name, so it's consistent
 remote func add_player(peer_id:int, affiliation_path:String, id:String) -> Player:
 	# Get references to nodes from paths
-	var affiliation:Affiliation = $affiliation_path
+	var affiliation:Affiliation = get_node(affiliation_path)
 	print("Add Player with ID ", id, " for ", peer_id, " to affiliation ID ", affiliation.id)
 
 	# Instance the player and set its information
@@ -136,7 +136,7 @@ remote func remove_affiliation(affiliation_path:String) -> void:
 	print("Remove Affiliation")
 
 	# Get a reference to the affiliation from the path
-	var affiliation:Affiliation = $affilation_path
+	var affiliation:Affiliation = get_node(affiliation_path)
 
 	# Ensure node is found and is an existing Affiliation
 	if not affiliation:
