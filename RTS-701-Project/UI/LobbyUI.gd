@@ -28,8 +28,8 @@ func update_color_rect(color_rect:ColorRect, affiliation:Affiliation) -> void:
 # TODO: Lobby UI should really be built by keeping the ui elements for affiliations around with them rather
 #       than rebuilding it every time, so it would stay more consistent during editing, but this isn't
 #       high priority
+# TODO: Break this up into smaller functions
 func build_ui() -> void:
-	print("Build UI")
 	var screen_height:float = get_viewport().size.y
 	var y:float = screen_height * 0.05
 
@@ -59,11 +59,12 @@ func build_ui() -> void:
 
 		var color_rect:ColorRect = new_affiliation_item.get_child(1)
 		color_rect.color = affiliation.color
+		assert(affiliation.connect("color_updated", color_rect, "set_frame_color") == OK)
 
 		var color_slider:HSlider = color_rect.get_child(0) # TODO: Only show slider when color_rect is clicked
 		color_slider.value = affiliation.color.h
 		assert(color_slider.connect("value_changed", affiliation, "rpc_set_color_from_hue") == OK)
-		assert(affiliation.connect("color_updated", color_rect, "set_frame_color") == OK)
+		assert(affiliation.connect("color_updated", color_slider, "set_value", [affiliation.color.h]))
 
 		var join_button:Button = new_affiliation_item.get_child(2)
 		if get_tree().get_network_unique_id() in main.player_info.keys(): # Maybe player isn't added yet
@@ -89,8 +90,20 @@ func build_ui() -> void:
 			label = new_player_item.get_child(0)
 			label.text = player.id
 			var ready_button:Button = new_player_item.get_child(1)
-			assert(ready_button.connect("toggled", player, "set_lobby_ready") == OK)
+			if player.is_network_master():
+				assert(ready_button.connect("toggled", player, "set_lobby_ready") == OK)
+			else:
+				# Show status indicator for other players instead of a checkbox
+				ready_button.set_visible(false)
+				var ready_indicator:ColorRect = ColorRect.new()
+				ready_indicator.rect_position = ready_button.rect_position
+				ready_indicator.rect_size = ready_button.size
+				if player.ready_to_start:
+					ready_indicator.color = Color.green
+				else:
+					ready_indicator.color = Color.red # TODO: Bad for colorblindness, vary brightness too
 
+				new_player_item.add_child(ready_indicator)
 			# All subsequent elements are further down, and the affiliation box expands
 			y += new_player_item.rect_size.y
 			new_affiliation_item.rect_size.y += new_player_item.rect_size.y
