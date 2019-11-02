@@ -80,7 +80,7 @@ func rpc_add_player(peer_id:int, affiliation:Affiliation, id:String) -> Player:
 	# Use paths to get nodes across all peers, can't pass references through RPC
 	var affiliation_path:String = affiliation.get_path()
 
-	rpc("add_player", peer_id, affiliation, id, true)
+	rpc("add_player", peer_id, affiliation_path, id, true)
 	return add_player(peer_id, affiliation_path, id, true)
 
 # Instance a player scene, map the network peer ID to it, and return it
