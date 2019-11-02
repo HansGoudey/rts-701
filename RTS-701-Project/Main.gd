@@ -33,14 +33,15 @@ func _ready():
 
 # In the lobby, start the game if all players are ready
 func check_game_start_lobby() -> void:
-	var all_players_ready:bool = true
-	for player_node in player_info.values():
-		if not player_node.ready_to_start:
-			all_players_ready = false
-			break
-	if all_players_ready:
-		start_game()
-		rpc("start_game")
+	if get_tree().get_network_unique_id() == 1:
+		var all_players_ready:bool = true
+		for player_node in player_info.values():
+			if not player_node.ready_to_start:
+				all_players_ready = false
+				break
+		if all_players_ready:
+			start_game()
+			rpc("start_game")
 
 # Puts a player in a certain affiliation on all peers
 func rpc_assign_player_to_affiliation(player:Player, affiliation:Affiliation) -> void:
