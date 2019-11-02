@@ -62,6 +62,7 @@ func build_ui() -> void:
 
 		var color_slider:HSlider = color_rect.get_child(0) # TODO: Only show slider when color_rect is clicked
 		color_slider.value = affiliation.color.h
+		assert(color_slider.connect("value_changed", affiliation, "rpc_set_color_from_hue") == OK)
 		assert(affiliation.connect("color_updated", color_rect, "set_frame_color") == OK)
 
 		var join_button:Button = new_affiliation_item.get_child(2)
