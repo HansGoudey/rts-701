@@ -10,7 +10,6 @@ be the child of an 'Affiliation' node.
 var assign_count:int = 0
 
 # Name for UI (not the name of the node)
-# warning-ignore:unused_class_variable
 var id:String = ""
 
 # Affiliation (should be the parent of this node)
@@ -203,7 +202,6 @@ func _input(event:InputEvent):
 				if event.pressed:
 					# Mouse just pressed or has been pressed
 					if create_building_mode:
-
 						create_building()
 					elif create_unit_mode:
 						create_unit()
@@ -231,3 +229,10 @@ func _input(event:InputEvent):
 						if entity is Unit:
 							var unit:Unit = entity as Unit
 							unit.add_navigation_order()
+
+func rpc_set_id(id:String) -> void:
+	set_id(id)
+	rpc("set_id", id)
+
+remote func set_id(id:String) -> void:
+	self.id = id

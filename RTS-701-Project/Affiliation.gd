@@ -5,6 +5,7 @@ class_name Affiliation
 # ID / Color
 var id:String = ""
 var color:Color = Color(0.0, 0.0, 0.0, 1.0)
+signal color_updated
 
 # Resource Counts
 var resources = []
@@ -32,7 +33,7 @@ remote func set_color_from_hue(hue:float) -> void:
 remote func set_color(color:Color) -> void:
 	self.color = color
 
-sync func set_id(id:String) -> void:
+remote func set_id(id:String) -> void:
 	self.id = id
 
 remote func change_resource(which:int, amount:float) -> void:

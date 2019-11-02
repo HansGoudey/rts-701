@@ -13,7 +13,6 @@ var self_id:int = 0
 var player_info = {} # {id: Player node}
 var player_name_from_title:String = ""
 var affiliations = [] # Only used during lobby phase, Game stores them after that
-var last_affiliation_added:Affiliation = null # To track which affiliation to add a new player from the server to
 var connected_success: bool = false
 signal lobby_ui_update
 
@@ -65,7 +64,12 @@ remote func assign_player_to_affiliation(player:Player, affiliation:Affiliation)
 func get_player(id:int) -> Player:
 	return player_info[id]
 
+func rpc_add_player(peer_id:int, affiliation:Affiliation, id:String) -> Player:
+	rpc("add_player", peer_id, affiliation, id)
+	return add_player(peer_id, affiliation, id)
+
 # Instance a player scene, map the network peer ID to it, and return it
+# Doesn't contain a 'name' argument because the unique peer ID is appended to the name, so it's consistent
 remote func add_player(peer_id:int, affiliation:Affiliation, id:String) -> Player:
 	print("Add Player with ID ", id, " for ", peer_id, " to affiliation ID ", affiliation.id)
 	var player_scene = load("res://Player.tscn")
@@ -81,11 +85,14 @@ remote func add_player(peer_id:int, affiliation:Affiliation, id:String) -> Playe
 	emit_signal("lobby_ui_update")
 	return player_node
 
+# Adds a new affiliation node with the same name to all peers
 func rpc_add_affiliation(color:Color, id:String) -> Affiliation:
-	rpc("add_affiliation", color, id)
-	return add_affiliation(color, id)
+	var new_affiliation_node:Affiliation = add_affiliation(color, id, "")
+	rpc("add_affiliation", color, id, new_affiliation_node.get_name())
+	return new_affiliation_node
 
-remote func add_affiliation(color:Color, id:String) -> Affiliation:
+# Adds an affiliation with a set name if it is supplied as a not-empty string
+remote func add_affiliation(color:Color, id:String, name:String) -> Affiliation:
 	print("Add Affiliation")
 	var affiliation_scene = load("res://Affiliation.tscn")
 	var affiliation_node:Affiliation = affiliation_scene.instance()
@@ -93,19 +100,19 @@ remote func add_affiliation(color:Color, id:String) -> Affiliation:
 	affiliation_node.set_network_master(1)
 	affiliation_node.id = id
 	affiliation_node.color = color
+	if name != "":
+		affiliation_node.set_name(name)
 	add_child(affiliation_node) # Add the affiliations as a child of Main for now, transfer them to Game later
 
 	emit_signal("lobby_ui_update")
 	return affiliation_node
 
-remote func remove_affiliation_string(name:String) -> void:
-	var affiliation_node:Affiliation = find_node(name, false, true)
-	remove_affiliation(affiliation_node)
-
+# Removes an affiliation on all peers
 func rpc_remove_affiliation(affiliation:Affiliation) -> void:
 	remove_affiliation(affiliation)
 	rpc("remove_affiliation", affiliation)
 
+# Removes an affiliation if there is more than one, reassigning its players to another
 remote func remove_affiliation(affiliation_node:Affiliation) -> void:
 	print("Remove Affiliation")
 	# Ensure node is found and is an existing Affiliation
@@ -131,7 +138,6 @@ remote func remove_affiliation(affiliation_node:Affiliation) -> void:
 		assign_player_to_affiliation(player, successor)
 
 	affiliations.erase(affiliation_node)
-
 	affiliation_node.queue_free()
 
 	emit_signal("lobby_ui_update")
@@ -191,7 +197,7 @@ func host_game() -> void:
 	self_id = 1
 
 	# Create one affiliation to start with
-	var affiliation:Affiliation = add_affiliation(Color(1, 0, 0), "Affiliation 1")
+	var affiliation:Affiliation = add_affiliation(Color(1, 0, 0), "Affiliation 1", "")
 
 	# Add player and add it to the affiliation
 	get_start_ui_player_name()
@@ -226,19 +232,9 @@ func join_game() -> void:
 	elif error == ERR_CANT_CREATE:
 		print("Can't create connection")
 
-remote func add_player_and_affiliation(new_peer_id:int, player_name_from_title:String):
-	print("Add Player and Affiliation: from ", new_peer_id, " with title ", player_name_from_title)
-	var new_affiliation:Affiliation = add_affiliation(Color(randf(), randf(), randf()), "New Affiliation")
-	add_player(new_peer_id, new_affiliation, player_name_from_title)
-
-remote func affiliation_to_new_peer(color:Color, id:String):
-	# We can't pass the affiliation to the new player, so instead set a variable on the other peer
-	# and use it when adding the players to this affiliation
-	last_affiliation_added = add_affiliation(color, id)
-
-# Adds a player, using the last affiliation node added that was set by adding the last affiliation
-remote func player_to_new_peer(peer_id:int, id:String):
-	add_player(peer_id, last_affiliation_added, id)
+remote func set_player_id_from_start_ui():
+	var my_player:Player = get_player(get_tree().get_network_unique_id())
+	my_player.rpc_set_id(player_name_from_title)
 
 # TODO: Should build the tree with the same nodes as the server. Maybe combine the "id" field with the
 #       name somehow, making sure it's unique
@@ -252,7 +248,7 @@ func network_peer_connected(new_peer_id):
 				# Add each affiliation to the new peer
 				var affiliation = child as Affiliation
 				print("    Adding affiliation (ID: " + affiliation.id + ")")
-				rpc_id(new_peer_id, "affiliation_to_new_peer", affiliation.color, affiliation.id)
+				rpc_id(new_peer_id, "add_affiliation", affiliation.color, affiliation.id, affiliation.get_name())
 
 				# Add that affiliation's players
 				for aff_child in affiliation.get_children():
@@ -261,19 +257,20 @@ func network_peer_connected(new_peer_id):
 						print("    Adding player (ID:", player.id, ", Affiliation: ", player.affiliation, ")")
 						rpc_id(new_peer_id, "player_to_new_peer", player.get_network_master(), player.id)
 
+		# Add a new affiliation and player to the newly joined peer
+		var new_affiliation:Affiliation = rpc_add_affiliation(Color(randf(), randf(), randf()), "New Affiliation")
+		rpc_add_player(new_peer_id, new_affiliation, "TEMP ID")
+		rpc_id(new_peer_id, "set_player_id_from_start_ui")
+
 func network_peer_disconnected(id):
+	# Get a unique affiliation name from the server
 	print("Network Peer Disconnected")
 	if get_tree().is_network_server():
 		remove_player(id)
 		rpc("remove_player", id)
 
 func connected_to_server():
-	print("Connected to Server")
-	# Add a new player and a new affiliation for the person who just joined
-	var my_id:int = get_tree().get_network_unique_id()
-	add_player_and_affiliation(my_id, player_name_from_title)
-	rpc("add_player_and_affiliation", my_id, player_name_from_title)
-	connected_success = true
+	pass
 
 func connection_failed():
 	pass
