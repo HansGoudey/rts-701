@@ -197,10 +197,6 @@ remote func start_game():
 	add_child(game_node)
 	$LobbyUI.queue_free()
 
-	# Pass the affiliations and players list to the game
-	game_node.affiliations = self.affiliations.duplicate()
-	self.affiliations = null
-
 	# Add the game UI for the player
 	get_player(get_tree().get_network_unique_id()).load_ui()
 

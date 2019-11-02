@@ -1,8 +1,5 @@
 extends Spatial
 
-# Affiliations
-var affiliations = []
-
 func _ready():
 	# Load map
 	var map_scene = preload("res://Map/Map.tscn")
