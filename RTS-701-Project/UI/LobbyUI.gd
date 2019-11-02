@@ -21,9 +21,6 @@ func _ready():
 
 	build_ui()
 
-func update_color_slider_position(color:Color, color_slider:HSlider) -> void:
-	color_slider.set_value(color.h)
-
 # Builds the entire lobby UI. Called whenever there is an update to affiliation / player structure
 # TODO: Lobby UI should really be built by keeping the ui elements for affiliations around with them rather
 #       than rebuilding it every time, so it would stay more consistent during editing, but this isn't
@@ -64,8 +61,6 @@ func build_ui() -> void:
 		var color_slider:HSlider = color_rect.get_child(0) # TODO: Only show slider when color_rect is clicked
 		color_slider.value = affiliation.color.h
 		assert(color_slider.connect("value_changed", affiliation, "rpc_set_color_from_hue") == OK)
-		if not affiliation.is_connected("color_updated", self, "update_color_slider_position"):
-			assert(affiliation.connect("color_updated", self, "update_color_slider_position", [color_slider]) == OK)
 
 		var join_button:Button = new_affiliation_item.get_child(2)
 		if get_tree().get_network_unique_id() in main.player_info.keys(): # Maybe player isn't added yet
