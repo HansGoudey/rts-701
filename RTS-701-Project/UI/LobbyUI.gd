@@ -64,7 +64,7 @@ func build_ui() -> void:
 		var color_slider:HSlider = color_rect.get_child(0) # TODO: Only show slider when color_rect is clicked
 		color_slider.value = affiliation.color.h
 		assert(color_slider.connect("value_changed", affiliation, "rpc_set_color_from_hue") == OK)
-		assert(affiliation.connect("color_updated", color_slider, "set_value", [affiliation.color.h]))
+		assert(affiliation.connect("color_updated", color_slider, "set_value", [affiliation.color.h]) == OK)
 
 		var join_button:Button = new_affiliation_item.get_child(2)
 		if get_tree().get_network_unique_id() in main.player_info.keys(): # Maybe player isn't added yet
@@ -97,7 +97,7 @@ func build_ui() -> void:
 				ready_button.set_visible(false)
 				var ready_indicator:ColorRect = ColorRect.new()
 				ready_indicator.rect_position = ready_button.rect_position
-				ready_indicator.rect_size = ready_button.size
+				ready_indicator.rect_size = ready_button.rect_size
 				if player.ready_to_start:
 					ready_indicator.color = Color.green
 				else:
