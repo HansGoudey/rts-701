@@ -76,6 +76,9 @@ func create_unit():
 
 	create_unit_mode = false
 
+remote func set_camera_translation(translation:Vector3):
+	camera.translation = translation
+
 func camera_movement(delta:float):
 	var camera_acceleration: float = 1
 	if Input.is_action_pressed("camera_right"):
@@ -95,7 +98,7 @@ func camera_movement(delta:float):
 	camera_velocity *= 0.95
 
 	camera.translation += camera_velocity
-	rset_unreliable("camera.translation", camera.translation)
+	rpc_unreliable("set_camera_translation", camera.translation)
 
 func set_lobby_ready(ready:bool) -> void:
 	self.ready_to_start = ready

@@ -31,6 +31,7 @@ remote func set_color_from_hue(hue:float) -> void:
 	set_color(color)
 
 remote func set_color(color:Color) -> void:
+	emit_signal("color_updated")
 	self.color = color
 
 remote func set_id(id:String) -> void:

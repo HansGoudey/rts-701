@@ -130,7 +130,7 @@ remote func add_affiliation(color:Color, id:String, name:String) -> Affiliation:
 	affiliation_node.color = color
 	if name != "":
 		affiliation_node.set_name(name)
-	add_child(affiliation_node) # Add the affiliations as a child of Main for now, transfer them to Game later
+	add_child(affiliation_node, true) # Add the affiliations as a child of Main for now, transfer them to Game later
 
 	emit_signal("lobby_ui_update")
 	return affiliation_node
@@ -282,7 +282,7 @@ func network_peer_connected(new_peer_id):
 				for aff_child in affiliation.get_children():
 					if aff_child is Player:
 						var player = aff_child as Player
-						print("    Adding player (ID:", player.id, ", Affiliation: ", player.affiliation, ")")
+						print("    Adding player (ID:", player.id, ", Affiliation: ", player.affiliation.get_name(), ")")
 						rpc_id(new_peer_id, "add_player", player.get_network_master(), player.affiliation.get_path(), player.id, false)
 
 		# Add a new affiliation and player to the newly joined peer
