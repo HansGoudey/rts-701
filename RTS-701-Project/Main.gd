@@ -14,6 +14,7 @@ var player_info = {} # {id: Player node}
 var player_name_from_title:String = ""
 var affiliations = [] # Only used during lobby phase, Game stores them after that
 var connected_success: bool = false
+var basin_instance: bool = false
 signal lobby_ui_update
 
 func _ready():
@@ -30,6 +31,11 @@ func _ready():
 	assert(get_tree().connect("connected_to_server", self, "_connected_ok") == OK)
 	assert(get_tree().connect("connection_failed", self, "_connected_fail") == OK)
 	assert(get_tree().connect("server_disconnected", self, "_server_disconnected") == OK)
+	
+	basin_instance = cmd_args_exist()
+	if basin_instance: # if run on basin set host game
+		host_game()
+	
 
 # In the lobby, start the game if all players are ready
 func check_game_start_lobby() -> void:
@@ -190,7 +196,13 @@ func host_game() -> void:
 	get_start_ui_player_name()
 	var player:Player = add_player(1, affiliation, player_name_from_title)
 	player_info[1] = player
-
+	
+	# if this is a basin instance set their lobby to be ready
+	if basin_instance: 
+		player.set_lobby_ready(true)
+		
+	
+	
 	start_lobby()
 
 func join_game() -> void:
@@ -255,3 +267,8 @@ func connection_failed():
 
 func server_disconnected():
 	pass
+
+func cmd_args_exist() -> bool:
+	# command line args will only exist if 
+	# basin is running this program 
+	return OS.get_cmdline_args().size() > 0 
