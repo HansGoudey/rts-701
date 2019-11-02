@@ -1,6 +1,7 @@
 extends Node
 
 class_name Player
+# TODO: Organize functions into sections
 
 """
 A player corresponds to a human interacting with an affiliation. It will always
@@ -46,27 +47,24 @@ func _ready():
 # Load UI when game is started
 func load_ui():
 	var ui_scene = load("res://UI/GameUI.tscn")
-	var ui_node:Control = ui_scene.instance()
-	add_child(ui_node)
-	assert(ui_node.connect("place_building", self, "place_building_down") == OK)
-	assert(ui_node.connect("place_unit", self, "place_unit_down") == OK)
+	var game_ui:Control = ui_scene.instance()
+	add_child(game_ui)
+	assert(game_ui.connect("place_building_pressed", self, "place_building_pressed") == OK)
+	assert(game_ui.connect("place_unit_pressed", self, "place_unit_pressed") == OK)
 
-func place_building_down():
+func place_building_pressed():
 	create_building_mode = true
+	create_unit_mode = false
 
-func place_unit_down():
+func place_unit_pressed():
 	create_unit_mode = true
-
-func create_building():
-	print("creating")
-	var building_scene = load("res://Buildings/Basic.glb")
-	var building_node = building_scene.instance()
-	building_node.translate(project_mouse_to_terrain_plane())
-	add_child(building_node)
-
 	create_building_mode = false
 
-func create_unit():
+func add_building():
+	affiliation.rpc_add_building(affiliation.BUILDING_TYPE_BASIC, project_mouse_to_terrain_plane())
+	create_building_mode = false
+
+func add_unit():
 	var unit_scene = load("res://Units/Basic.glb")
 	var unit_node = unit_scene.instance()
 	unit_node.translate(project_mouse_to_terrain_plane())
@@ -98,10 +96,6 @@ func camera_movement(delta:float):
 
 	camera.translation += camera_velocity
 	rpc_unreliable("set_camera_translation", camera.translation)
-
-func set_lobby_ready(ready:bool) -> void:
-	self.ready_to_start = ready
-	emit_signal("ready_to_start")
 
 # Select the entity under the mouse cursor to the selection
 func select_entity():
@@ -197,16 +191,16 @@ func _process(delta):
 		if mouse_drag:
 			handle_box_select() # Put this here so the selection updates when there are no mouse events
 
-func _unhandled_input(event:InputEvent):
+func _input(event:InputEvent):
 	if self.is_network_master():
 		if event is InputEventMouseButton:
 			if event.button_index == BUTTON_LEFT:
 				if event.pressed:
 					# Mouse just pressed or has been pressed
 					if create_building_mode:
-						create_building()
+						add_building()
 					elif create_unit_mode:
-						create_unit()
+						add_unit()
 					else:
 						mouse_down_left = true
 						if mouse_drag:
@@ -238,3 +232,11 @@ func rpc_set_id(id:String) -> void:
 
 remote func set_id(id:String) -> void:
 	self.id = id
+
+func rpc_set_lobby_ready(ready:bool) -> void:
+	set_lobby_ready(ready)
+	rpc("set_lobby_ready", ready)
+
+remote func set_lobby_ready(ready:bool) -> void:
+	self.ready_to_start = ready
+	emit_signal("ready_to_start")

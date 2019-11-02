@@ -65,7 +65,7 @@ remote func assign_player_to_affiliation(player_path:String, affiliation_path:St
 		player.affiliation.players.erase(player)
 
 	# Add the player to the specified affiliation
-	affiliation.add_player(player)
+	affiliation.assign_player(player)
 	affiliation.add_child(player)
 	player.affiliation = affiliation
 	emit_signal("lobby_ui_update")

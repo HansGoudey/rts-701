@@ -87,7 +87,7 @@ func build_ui() -> void:
 			label.text = player.id
 			var ready_button:Button = new_player_item.get_child(1)
 			if player.is_network_master():
-				assert(ready_button.connect("toggled", player, "set_lobby_ready") == OK)
+				assert(ready_button.connect("toggled", player, "rpc_set_lobby_ready") == OK)
 			else:
 				# Show status indicator for other players instead of a checkbox
 				ready_button.set_visible(false)
