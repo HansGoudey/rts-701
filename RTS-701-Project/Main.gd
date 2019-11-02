@@ -42,12 +42,21 @@ func check_game_start_lobby() -> void:
 		start_game()
 		rpc("start_game")
 
+# Puts a player in a certain affiliation on all peers
 func rpc_assign_player_to_affiliation(player:Player, affiliation:Affiliation) -> void:
-	assign_player_to_affiliation(player, affiliation)
-	rpc("assign_player_to_affiliation", player, affiliation)
+	# Pass the paths to the player and affiliation, references don't make sense across peers
+	var player_path:String = player.get_path()
+	var affiliation_path:String = affiliation.get_path()
+	assign_player_to_affiliation(player_path, affiliation_path)
+	rpc("assign_player_to_affiliation", player_path, affiliation_path)
 
-remote func assign_player_to_affiliation(player:Player, affiliation:Affiliation) -> void:
+remote func assign_player_to_affiliation(player_path:String, affiliation_path:String) -> void:
 	print("Assign Player to Affiliation")
+
+	# Get the nodes from the paths
+	var player:Player = $player_path
+	var affiliation:Affiliation = $affiliation_path
+
 	# Remove this player from the affiliation its current one
 	if player.affiliation:
 		player.affiliation.players.erase(player)
@@ -64,20 +73,28 @@ remote func assign_player_to_affiliation(player:Player, affiliation:Affiliation)
 func get_player(id:int) -> Player:
 	return player_info[id]
 
+# Add a player on all peers, including this one, returning a reference to the local player
 func rpc_add_player(peer_id:int, affiliation:Affiliation, id:String) -> Player:
+	# Use paths to get nodes across all peers, can't pass references through RPC
+	var affiliation_path:String = affiliation.get_path()
+
 	rpc("add_player", peer_id, affiliation, id)
-	return add_player(peer_id, affiliation, id)
+	return add_player(peer_id, affiliation_path, id)
 
 # Instance a player scene, map the network peer ID to it, and return it
 # Doesn't contain a 'name' argument because the unique peer ID is appended to the name, so it's consistent
-remote func add_player(peer_id:int, affiliation:Affiliation, id:String) -> Player:
+remote func add_player(peer_id:int, affiliation_path:String, id:String) -> Player:
+	# Get references to nodes from paths
+	var affiliation:Affiliation = $affiliation_path
 	print("Add Player with ID ", id, " for ", peer_id, " to affiliation ID ", affiliation.id)
+
+	# Instance the player and set its information
 	var player_scene = load("res://Player.tscn")
 	var player_node:Player = player_scene.instance()
 	player_node.set_name("Player" + str(peer_id))
 	player_node.set_network_master(peer_id)
 	player_node.id = id
-	assign_player_to_affiliation(player_node, affiliation)
+	assign_player_to_affiliation(player_node.get_path(), affiliation_path)
 
 	player_info[peer_id] = player_node
 	assert(player_node.connect("ready_to_start", self, "check_game_start_lobby") == 0)
@@ -109,16 +126,22 @@ remote func add_affiliation(color:Color, id:String, name:String) -> Affiliation:
 
 # Removes an affiliation on all peers
 func rpc_remove_affiliation(affiliation:Affiliation) -> void:
-	remove_affiliation(affiliation)
-	rpc("remove_affiliation", affiliation)
+	# Pass paths through RPC instead of references
+	var affiliation_path:String = affiliation.get_path()
+	remove_affiliation(affiliation_path)
+	rpc("remove_affiliation", affiliation_path)
 
 # Removes an affiliation if there is more than one, reassigning its players to another
-remote func remove_affiliation(affiliation_node:Affiliation) -> void:
+remote func remove_affiliation(affiliation_path:String) -> void:
 	print("Remove Affiliation")
+
+	# Get a reference to the affiliation from the path
+	var affiliation:Affiliation = $affilation_path
+
 	# Ensure node is found and is an existing Affiliation
-	if not affiliation_node:
+	if not affiliation:
 		return
-	if not affiliation_node is Affiliation:
+	if not affiliation is Affiliation:
 		return
 	if affiliations.size() == 1: # Do not allow deleting the last affiliation
 		return
@@ -126,7 +149,7 @@ remote func remove_affiliation(affiliation_node:Affiliation) -> void:
 	# Find the affiliation in the list
 	var i_to_delete:int = 0
 	for i in range(affiliations.size()):
-		if affiliations[i] == affiliation_node:
+		if affiliations[i] == affiliation:
 			i_to_delete = i # location of the affiliation to delete in list
 			break
 
@@ -134,11 +157,11 @@ remote func remove_affiliation(affiliation_node:Affiliation) -> void:
 
 	var successor:Affiliation = affiliations[i_to_move_to]
 
-	for player in affiliation_node.players:
-		assign_player_to_affiliation(player, successor)
+	for player in affiliation.players:
+		assign_player_to_affiliation(player.get_path(), successor.get_path())
 
-	affiliations.erase(affiliation_node)
-	affiliation_node.queue_free()
+	affiliations.erase(affiliation)
+	affiliation.queue_free()
 
 	emit_signal("lobby_ui_update")
 
@@ -201,7 +224,7 @@ func host_game() -> void:
 
 	# Add player and add it to the affiliation
 	get_start_ui_player_name()
-	var player:Player = add_player(1, affiliation, player_name_from_title)
+	var player:Player = add_player(1, affiliation.get_path(), player_name_from_title)
 	player_info[1] = player
 
 	start_lobby()
@@ -236,8 +259,6 @@ remote func set_player_id_from_start_ui():
 	var my_player:Player = get_player(get_tree().get_network_unique_id())
 	my_player.rpc_set_id(player_name_from_title)
 
-# TODO: Should build the tree with the same nodes as the server. Maybe combine the "id" field with the
-#       name somehow, making sure it's unique
 func network_peer_connected(new_peer_id):
 	print("Network Peer Connected with new id ", new_peer_id)
 	if get_tree().is_network_server():
@@ -255,7 +276,7 @@ func network_peer_connected(new_peer_id):
 					if aff_child is Player:
 						var player = aff_child as Player
 						print("    Adding player (ID:", player.id, ", Affiliation: ", player.affiliation, ")")
-						rpc_id(new_peer_id, "add_player", player.get_network_master(), player.affiliation, player.id)
+						rpc_id(new_peer_id, "add_player", player.get_network_master(), player.affiliation.get_path(), player.id)
 
 		# Add a new affiliation and player to the newly joined peer
 		var new_affiliation:Affiliation = rpc_add_affiliation(Color(randf(), randf(), randf()), "New Affiliation")
