@@ -14,6 +14,7 @@ var player_info = {} # {id: Player node}
 var player_name_from_title:String = ""
 var affiliations = [] # Only used during lobby phase, Game stores them after that
 var connected_success: bool = false
+var basin_instance: bool = false
 signal lobby_ui_update
 
 func _ready():
@@ -26,24 +27,32 @@ func _ready():
 
 	# Connect networking functions
 	assert(get_tree().connect("network_peer_connected", self, "network_peer_connected") == OK)
-	assert(get_tree().connect("network_peer_disconnected", self, "network_peer_disconnected") == OK)
-	assert(get_tree().connect("connected_to_server", self, "connected_to_server") == OK)
-	assert(get_tree().connect("connection_failed", self, "connection_failed") == OK)
-	assert(get_tree().connect("server_disconnected", self, "server_disconnected") == OK)
+	assert(get_tree().connect("network_peer_disconnected", self, "_player_disconnected") == OK)
+	assert(get_tree().connect("connected_to_server", self, "_connected_ok") == OK)
+	assert(get_tree().connect("connection_failed", self, "_connected_fail") == OK)
+	assert(get_tree().connect("server_disconnected", self, "_server_disconnected") == OK)
+	
+	basin_instance = cmd_args_exist()
+	if basin_instance: # if run on basin set host game
+		host_game()
+	
 
 # In the lobby, start the game if all players are ready
 func check_game_start_lobby() -> void:
-	if get_tree().get_network_unique_id() == 1:
-		var all_players_ready:bool = true
-		for player_node in player_info.values():
-			if not player_node.ready_to_start:
-				all_players_ready = false
-				break
-		if all_players_ready:
-			start_game()
-			rpc("start_game")
+	var all_players_ready:bool = true
+	for player_node in player_info.values():
+		
+		if not player_node.ready_to_start:
+			all_players_ready = false
+			break
+	
+	# on basin, there should be at least be one other player in the lobby
+	if basin_instance and player_info.size() < 2:
+		all_players_ready = false
+	if all_players_ready:
+		start_game()
+		rpc("start_game")
 
-# Puts a player in a certain affiliation on all peers
 func rpc_assign_player_to_affiliation(player:Player, affiliation:Affiliation) -> void:
 	# Pass the paths to the player and affiliation, references don't make sense across peers
 	var player_path:String = player.get_path()
@@ -96,6 +105,8 @@ remote func add_player(peer_id:int, affiliation_path:String, id:String, use_star
 	var player_node:Player = player_scene.instance()
 	player_node.set_name("Player" + str(peer_id))
 	player_node.set_network_master(peer_id)
+	player_node.id = id
+	assign_player_to_affiliation(player_node, affiliation)
 
 	if not use_start_ui_id:
 		player_node.id = id
@@ -231,9 +242,15 @@ func host_game() -> void:
 
 	# Add player and add it to the affiliation
 	get_start_ui_player_name()
-	var player:Player = add_player(1, affiliation.get_path(), player_name_from_title, false)
+	var player:Player = add_player(1, affiliation, player_name_from_title)
+	
+	# basin should automatically be ready when the server starts
+	if basin_instance:
+		player.set_lobby_ready(true)
+	
 	player_info[1] = player
-
+	
+	
 	start_lobby()
 
 func join_game() -> void:
@@ -302,3 +319,8 @@ func connection_failed():
 
 func server_disconnected():
 	pass
+
+func cmd_args_exist() -> bool:
+	# command line args will only exist if 
+	# basin is running this program 
+	return OS.get_cmdline_args().size() > 0 
