@@ -106,7 +106,6 @@ remote func add_player(peer_id:int, affiliation_path:String, id:String, use_star
 	player_node.set_name("Player" + str(peer_id))
 	player_node.set_network_master(peer_id)
 	player_node.id = id
-	assign_player_to_affiliation(player_node, affiliation)
 
 	if not use_start_ui_id:
 		player_node.id = id
@@ -242,7 +241,7 @@ func host_game() -> void:
 
 	# Add player and add it to the affiliation
 	get_start_ui_player_name()
-	var player:Player = add_player(1, affiliation, player_name_from_title)
+	var player:Player = add_player(1, affiliation.get_path(), player_name_from_title, true)
 	
 	# basin should automatically be ready when the server starts
 	if basin_instance:
