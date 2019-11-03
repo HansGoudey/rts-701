@@ -44,6 +44,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://Projectile.gd"
 }, {
+"base": "Spatial",
+"class": "ResourceBasic",
+"language": "GDScript",
+"path": "res://Resources/ResourceBasic.gd"
+}, {
 "base": "Entity",
 "class": "Unit",
 "language": "GDScript",
@@ -57,6 +62,7 @@ _global_script_class_icons={
 "Order": "",
 "Player": "",
 "Projectile": "",
+"ResourceBasic": "",
 "Unit": ""
 }
 
@@ -68,8 +74,8 @@ config/icon="res://icon.png"
 
 [display]
 
-window/size/width=1920
-window/size/height=1080
+window/size/width=649
+window/size/height=292
 
 [input]
 
