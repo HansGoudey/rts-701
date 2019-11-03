@@ -1,16 +1,14 @@
 extends Node
 
 class_name Player
+# TODO: Organize functions into sections
 
 """
 A player corresponds to a human interacting with an affiliation. It will always
 be the child of an 'Affiliation' node.
 """
 
-var assign_count:int = 0
-
 # Name for UI (not the name of the node)
-# warning-ignore:unused_class_variable
 var id:String = ""
 
 # Affiliation (should be the parent of this node)
@@ -39,8 +37,8 @@ var camera:Camera
 var camera_velocity:Vector3 = Vector3(0, 0, 0)
 
 # Creating a new building and unit
-var create_building:bool = false
-var create_unit:bool = false
+var create_building_mode:bool = false
+var create_unit_mode:bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -49,33 +47,29 @@ func _ready():
 # Load UI when game is started
 func load_ui():
 	var ui_scene = load("res://UI/GameUI.tscn")
-	var ui_node:Control = ui_scene.instance()
-	add_child(ui_node)
-	ui_node.connect("place_building", self, "place_building_down")
-	assert(ui_node.connect("place_unit", self, "place_unit_down") == OK)
-		
-func place_building_down():
-	create_building = true
+	var game_ui:Control = ui_scene.instance()
+	add_child(game_ui)
+	assert(game_ui.connect("place_building_pressed", self, "place_building_pressed") == OK)
+	assert(game_ui.connect("place_unit_pressed", self, "place_unit_pressed") == OK)
 
-func place_unit_down():
-	create_unit = true
+func place_building_pressed():
+	create_building_mode = true
+	create_unit_mode = false
 
-func create_building():
-	print("creating")
-	var building_scene = load("res://Buildings/Basic.glb")
-	var building_node = building_scene.instance()
-	building_node.translate(project_mouse_to_terrain_plane())
-	add_child(building_node)
-	
-	create_building = false
+func place_unit_pressed():
+	create_unit_mode = true
+	create_building_mode = false
 
-func create_unit():
-	var unit_scene = load("res://Units/Basic.glb")
-	var unit_node = unit_scene.instance()
-	unit_node.translate(project_mouse_to_terrain_plane())
-	add_child(unit_node)
-	
-	create_unit = false
+func add_building():
+	affiliation.rpc_add_building(affiliation.BUILDING_TYPE_BASIC, project_mouse_to_terrain_plane())
+	create_building_mode = false
+
+func add_unit():
+	affiliation.rpc_add_unit(affiliation.UNIT_TYPE_BASIC, project_mouse_to_terrain_plane())
+	create_unit_mode = false
+
+remote func set_camera_translation(translation:Vector3):
+	camera.translation = translation
 
 func camera_movement(delta:float):
 	var camera_acceleration: float = 1
@@ -93,14 +87,11 @@ func camera_movement(delta:float):
 		camera_velocity.y -= delta * camera_acceleration
 
 	# Smoothly lower the camera velocity
+	# TODO: This means the smoothness depends on the framerate. The delta should be incorporated here
 	camera_velocity *= 0.95
 
 	camera.translation += camera_velocity
-	rset_unreliable("camera.translation", camera.translation)
-
-func set_lobby_ready(ready:bool) -> void:
-	self.ready_to_start = ready
-	emit_signal("ready_to_start")
+	rpc_unreliable("set_camera_translation", camera.translation)
 
 # Select the entity under the mouse cursor to the selection
 func select_entity():
@@ -143,7 +134,7 @@ func project_mouse_to_terrain_plane() -> Vector3:
 
 	# TODO: Use a raycast to intersect with terrain instead of the y = 0 plane
 	var navigation_node:Navigation = get_node("/root/Main/Game/Map/Navigation")
-	
+
 	if navigation_node:
 		return navigation_node.get_closest_point_to_segment(from, to)
 	else:
@@ -202,11 +193,10 @@ func _input(event:InputEvent):
 			if event.button_index == BUTTON_LEFT:
 				if event.pressed:
 					# Mouse just pressed or has been pressed
-					if create_building:
-						print('Creating building')
-						create_building()
-					elif create_unit:
-						create_unit()
+					if create_building_mode:
+						add_building()
+					elif create_unit_mode:
+						add_unit()
 					else:
 						mouse_down_left = true
 						if mouse_drag:
@@ -231,3 +221,18 @@ func _input(event:InputEvent):
 						if entity is Unit:
 							var unit:Unit = entity as Unit
 							unit.add_navigation_order()
+
+func rpc_set_id(id:String) -> void:
+	set_id(id)
+	rpc("set_id", id)
+
+remote func set_id(id:String) -> void:
+	self.id = id
+
+func rpc_set_lobby_ready(ready:bool) -> void:
+	set_lobby_ready(ready)
+	rpc("set_lobby_ready", ready)
+
+remote func set_lobby_ready(ready:bool) -> void:
+	self.ready_to_start = ready
+	emit_signal("ready_to_start")

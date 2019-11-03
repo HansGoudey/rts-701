@@ -52,7 +52,7 @@ margin_left = 518.133
 margin_top = 350.42
 margin_right = 726.133
 margin_bottom = 395.42
-text = "140.233.207.51"
+text = "140.233"
 
 [node name="NameField" type="TextEdit" parent="."]
 margin_left = 725.479

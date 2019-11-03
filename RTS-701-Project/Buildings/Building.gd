@@ -15,7 +15,7 @@ func _process(delta):
 	if production_countdown > 0:
 		production_countdown -= delta
 	if production_countdown < 0:
-		production_finished()		
+		production_finished()
 
 # Functions to be over
 
