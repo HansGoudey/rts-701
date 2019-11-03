@@ -41,9 +41,14 @@ func _ready():
 func check_game_start_lobby() -> void:
 	var all_players_ready:bool = true
 	for player_node in player_info.values():
+		
 		if not player_node.ready_to_start:
 			all_players_ready = false
 			break
+	
+	# on basin, there should be at least be one other player in the lobby
+	if basin_instance and player_info.size() < 2:
+		all_players_ready = false
 	if all_players_ready:
 		start_game()
 		rpc("start_game")
@@ -77,7 +82,7 @@ remote func add_player(peer_id:int, affiliation:Affiliation, id:String) -> Playe
 	var player_node:Player = player_scene.instance()
 	player_node.set_name("Player" + str(peer_id))
 	player_node.set_network_master(peer_id)
-	player_node.id = id	
+	player_node.id = id
 	assign_player_to_affiliation(player_node, affiliation)
 
 	player_info[id] = player_node
@@ -195,12 +200,12 @@ func host_game() -> void:
 	# Add player and add it to the affiliation
 	get_start_ui_player_name()
 	var player:Player = add_player(1, affiliation, player_name_from_title)
-	player_info[1] = player
 	
-	# if this is a basin instance set their lobby to be ready
-	if basin_instance: 
+	# basin should automatically be ready when the server starts
+	if basin_instance:
 		player.set_lobby_ready(true)
-		
+	
+	player_info[1] = player
 	
 	
 	start_lobby()
