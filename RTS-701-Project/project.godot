@@ -29,6 +29,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://Main.gd"
 }, {
+"base": "Spatial",
+"class": "MapResource",
+"language": "GDScript",
+"path": "res://Resources/Resource.gd"
+}, {
 "base": "Node",
 "class": "Order",
 "language": "GDScript",
@@ -44,11 +49,6 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://Projectile.gd"
 }, {
-"base": "Spatial",
-"class": "ResourceBasic",
-"language": "GDScript",
-"path": "res://Resources/ResourceBasic.gd"
-}, {
 "base": "Entity",
 "class": "Unit",
 "language": "GDScript",
@@ -59,10 +59,10 @@ _global_script_class_icons={
 "Building": "",
 "Entity": "",
 "Main": "",
+"MapResource": "",
 "Order": "",
 "Player": "",
 "Projectile": "",
-"ResourceBasic": "",
 "Unit": ""
 }
 
@@ -74,8 +74,8 @@ config/icon="res://icon.png"
 
 [display]
 
-window/size/width=649
-window/size/height=292
+window/size/width=1920
+window/size/height=1080
 
 [input]
 
