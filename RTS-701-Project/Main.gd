@@ -31,21 +31,21 @@ func _ready():
 	assert(get_tree().connect("connected_to_server", self, "_connected_ok") == OK)
 	assert(get_tree().connect("connection_failed", self, "_connected_fail") == OK)
 	assert(get_tree().connect("server_disconnected", self, "_server_disconnected") == OK)
-	
+
 	basin_instance = cmd_args_exist()
 	if basin_instance: # if run on basin set host game
 		host_game()
-	
+
 
 # In the lobby, start the game if all players are ready
 func check_game_start_lobby() -> void:
 	var all_players_ready:bool = true
 	for player_node in player_info.values():
-		
+
 		if not player_node.ready_to_start:
 			all_players_ready = false
 			break
-	
+
 	# on basin, there should be at least be one other player in the lobby
 	if basin_instance and player_info.size() < 2:
 		all_players_ready = false
@@ -243,14 +243,14 @@ func host_game() -> void:
 	# Add player and add it to the affiliation
 	get_start_ui_player_name()
 	var player:Player = add_player(1, affiliation, player_name_from_title)
-	
+
 	# basin should automatically be ready when the server starts
 	if basin_instance:
 		player.set_lobby_ready(true)
-	
+
 	player_info[1] = player
-	
-	
+
+
 	start_lobby()
 
 func join_game() -> void:
@@ -321,6 +321,6 @@ func server_disconnected():
 	pass
 
 func cmd_args_exist() -> bool:
-	# command line args will only exist if 
-	# basin is running this program 
-	return OS.get_cmdline_args().size() > 0 
+	# command line args will only exist if
+	# basin is running this program
+	return OS.get_cmdline_args().size() > 0
