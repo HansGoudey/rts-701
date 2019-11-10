@@ -3,9 +3,9 @@ extends Entity
 class_name Building
 
 # Production State (Countdown or position in production process)
-var production_selection: int = 0
-var production_countdown: float = 0
-var production_active: bool = 0
+var production_selection:int = 0
+var production_countdown:float = 0
+var production_active:bool = 0
 
 func _ready():
 	pass
@@ -17,7 +17,10 @@ func _process(delta):
 	if production_countdown < 0:
 		production_finished()
 
-# Functions to be over
+
+# =================================================================================================
+# ========== Override methods for functionality specific to specific types of buildings ===========
+# =================================================================================================
 
 func production_finished() -> void:
 	pass

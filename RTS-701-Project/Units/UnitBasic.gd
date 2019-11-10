@@ -5,23 +5,31 @@ func _ready():
 	health = maximum_health
 	damage_type_multipliers = [1, 1, 1]
 
-#func _process(delta):
-#	pass
-
-# Override Functions from Unit Class
-	
-func action_complete(type:int):
+func _process(delta):
 	pass
 
-# Override Functions from Entity Class
+
+# =================================================================================================
+# ============================= Functions overriden from Entity Class =============================
+# =================================================================================================
 
 func initialize_health() -> void:
 	maximum_health = 100
 	health = maximum_health
-	
-func set_cost() -> void:
-	pass
 
-	
+func set_cost():
+# warning-ignore:unused_variable
+	for i in range(affiliation.resources.size()):
+		cost.append(10)
+
 func die() -> void:
 	pass
+
+
+# =================================================================================================
+# ============================== Functions overriden from Unit Class ==============================
+# =================================================================================================
+
+func action_complete(type:int):
+	pass
+

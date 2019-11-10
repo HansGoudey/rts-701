@@ -23,6 +23,7 @@ var mouse_down_left:bool = false
 var mouse_drag:bool = false
 var mouse_drag_time:float = 0
 const DRAG_START_TIME:float = 0.2
+const ENTITY_SELECTION_MAX_DISTANCE:float = 4.0
 
 # Box Select State
 var box_select_start:Vector3 = Vector3(0, 0, 0)
@@ -30,7 +31,8 @@ var box_select_end:Vector3 = Vector3(0, 0, 0)
 var box_entities = []
 
 # Selected Entities (group of 'Entity' nodes)
-var selected_entities = []
+# TODO: Sync selected entities with players in the same affiliation so they know what you're doing
+var selected_entities = [] # TODO: Maybe switch to using built in Godot groups
 
 # Camera Node (should be child of this node)
 var camera:Camera
@@ -43,6 +45,10 @@ var create_unit_mode:bool = false
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	camera = get_node("Camera")
+
+	# Make this player's camera the active camera if it is the player for the local computer
+	if self.is_network_master():
+		camera.make_current()
 
 # Load UI when game is started
 func load_ui():
@@ -93,8 +99,15 @@ func camera_movement(delta:float):
 	camera.translation += camera_velocity
 	rpc_unreliable("set_camera_translation", camera.translation)
 
+func clear_selected_entities() -> void:
+	for node in selected_entities:
+		var entity:Entity = node as Entity
+		entity.deselect()
+	selected_entities.clear()
+
 # Select the entity under the mouse cursor to the selection
-func select_entity():
+func select_entity() -> void:
+	print("Select Entity")
 	# Linear search for the closest entity to the point projected on the terrain
 	var selection_point:Vector3 = project_mouse_to_terrain_plane()
 	var closest_distance:float = 9999999 # TODO: Figure out max float
@@ -102,15 +115,19 @@ func select_entity():
 	for child in affiliation.get_children():
 		if child is Entity:
 			var entity:Entity = child as Entity
-			if entity.get_translation().distance_to(selection_point) < closest_distance:
+			var distance_to_entity = entity.get_translation().distance_to(selection_point)
+			if distance_to_entity < closest_distance:
+				closest_distance = distance_to_entity
 				closest_entity = entity
 
 	# Check for no entities found and create selection
-	if not closest_entity:
+	if not closest_entity or closest_distance > ENTITY_SELECTION_MAX_DISTANCE:
 		return
+	closest_entity.select()
 	if Input.is_key_pressed(KEY_SHIFT):
-		selected_entities += [closest_entity] # TODO: Does this concatonate arrays??
+		selected_entities.append(closest_entity) # TODO: Does this concatonate arrays??
 	else:
+		clear_selected_entities()
 		selected_entities = [closest_entity]
 
 # Intersection of a line with a plane. Returns (0, 0, 0) if parallel.
@@ -132,7 +149,6 @@ func project_mouse_to_terrain_plane() -> Vector3:
 	var from:Vector3 = camera.project_ray_origin(mouse_position)
 	var to:Vector3 = from + camera.project_ray_normal(mouse_position) * 1000
 
-	# TODO: Use a raycast to intersect with terrain instead of the y = 0 plane
 	var navigation_node:Navigation = get_node("/root/Main/Game/Map/Navigation")
 
 	if navigation_node:
@@ -140,16 +156,19 @@ func project_mouse_to_terrain_plane() -> Vector3:
 	else:
 		return isect_line_plane_v3(to, from, Vector3(0, 0, 0), Vector3(0, 1, 0))
 
-func start_box_select():
+func start_box_select() -> void:
+	print("Start Box Select")
 	# Raycast to the terrain plane (y = 0) to get the starting location
 	box_select_start = project_mouse_to_terrain_plane()
 
 # Select the entities inside the box drawn by a mouse drag
-func handle_box_select():
+func handle_box_select() -> void:
+	print("Handle Box Select")
 	# Raycast to the terrain to get the second box select location
 	box_select_end = project_mouse_to_terrain_plane()
 
 	# Then find all of the entities within the box
+	box_entities.clear() # Start building box_entities from scratch
 	for child in affiliation.get_children():
 		if child is Entity:
 			# Figure out it the entity is in the box, accounting for a the box end being larger or smaller than the start
@@ -168,12 +187,15 @@ func handle_box_select():
 
 			# If we're still in this iteration the entity is in the box, so append it
 			box_entities.append(child)
+			child.select()
 
-func end_box_select():
+func end_box_select() -> void:
+	print("End Box Select")
 	# Replace the selection or add it to the current selection depending on modifier keys
 	if Input.is_key_pressed(KEY_SHIFT):
 		selected_entities += box_entities # TODO: Does this concatonate arrays??
 	else:
+		clear_selected_entities()
 		selected_entities = box_entities.duplicate()
 
 	# We're done with the box select entities array now
@@ -184,15 +206,19 @@ func _process(delta):
 		camera_movement(delta)
 		if mouse_down_left:
 			mouse_drag_time += delta
-		if mouse_drag:
-			handle_box_select() # Put this here so the selection updates when there are no mouse events
+
+			# Start box select routine if the mouse has dragged for long enough
+			if mouse_drag_time > DRAG_START_TIME and not mouse_drag:
+				mouse_drag = true
+				start_box_select()
+			if mouse_drag:
+				handle_box_select() # Put this here so the selection updates when there are no mouse events
 
 func _input(event:InputEvent):
 	if self.is_network_master():
 		if event is InputEventMouseButton:
 			if event.button_index == BUTTON_LEFT:
-				if event.pressed:
-					# Mouse just pressed or has been pressed
+				if event.pressed: # Mouse just pressed or has been pressed
 					if create_building_mode:
 						add_building()
 					elif create_unit_mode:
@@ -200,13 +226,9 @@ func _input(event:InputEvent):
 					else:
 						mouse_down_left = true
 						if mouse_drag:
-							pass
-						elif mouse_drag_time > DRAG_START_TIME:
-							# Start mouse drag after holding it down for enough time
-							mouse_drag = true
-							start_box_select()
-				else:
-					# Mouse just released
+							print("mouse_drag")
+							handle_box_select()
+				else: # Mouse just released
 					mouse_down_left = false
 					# If the mouse wasn't dragging and it was released, run select
 					if mouse_drag:

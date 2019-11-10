@@ -1,21 +1,34 @@
 extends Building
 
 func _ready():
-	var mesh_file = load("res://Buildings/Basic.glb")
-	add_child(mesh_file.instance())
+	maximum_health = 100
+	health = maximum_health
+	damage_type_multipliers = [1, 1, 1]
 
-# Override Functions rom Building class
-
-func production_finish() -> void:
+func _process(delta):
 	pass
 
-# Override Functions from Entity Class
+
+# =================================================================================================
+# ============================= Functions overriden from Entity Class =============================
+# =================================================================================================
+
+func initialize_health() -> void:
+	maximum_health = 100
+	health = maximum_health
 
 func set_cost() -> void:
-	# TODO: Use global for entire game to define the number of resources
+# warning-ignore:unused_variable
 	for i in range(affiliation.resources.size()):
 		cost.append(10)
 
-func initialize_health():
-	maximum_health = 100
-	health = maximum_health
+func die() -> void:
+	pass
+
+
+# =================================================================================================
+# ============================ Functions overriden from Building Class ============================
+# =================================================================================================
+
+func production_finish() -> void:
+	pass

@@ -50,6 +50,7 @@ func rpc_change_resource(which:int, amount:float) -> void:
 	rpc("change_resource", which, amount)
 
 remote func change_resource(which:int, amount:float) -> void:
+#	print("Change resource: ", which, " by ", amount)
 	assert(which < resources.size())
 	resources[which] += amount
 	if which == 0:
@@ -90,7 +91,7 @@ func rpc_add_unit(type:int, position:Vector3):
 remote func add_unit(type:int, position:Vector3, name:String):
 	var unit_scene
 	if type == BUILDING_TYPE_BASIC:
-		unit_scene = load("res://Units/Basic.glb")
+		unit_scene = load("res://Units/UnitBasic.tscn")
 	var unit_node = unit_scene.instance()
 	unit_node.translate(position)
 	if name != "":

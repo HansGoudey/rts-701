@@ -13,8 +13,8 @@ var self_id:int = 0
 var player_info = {} # {id: Player node}
 var player_name_from_title:String = ""
 var affiliations = [] # Only used during lobby phase, Game stores them after that
-var connected_success: bool = false
-var basin_instance: bool = false
+var connected_success:bool = false
+var basin_instance:bool = false
 signal lobby_ui_update
 
 func _ready():

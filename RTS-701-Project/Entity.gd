@@ -19,34 +19,66 @@ var cost = []
 
 # Selection by Player
 var selected:bool = false
+var select_circle:Spatial
 
 func _ready():
-	add_entity()
-	rpc("add_entity")
-
-remote func add_entity():
 	affiliation = self.get_parent()
+
 	set_cost()
+
+	if not check_cost_and_resources():
+		return
+
 	for i in range(affiliation.resources.size()):
-		affiliation.change_resource(i, cost[i])
+		affiliation.rpc_change_resource(i, -cost[i])
+
 	initialize_health()
 
-func _process(delta):
-	if selected:
-		pass
-		# Show a difference
+	# Add a circle the size of the mesh below it to show when the entity is selected
+	# TODO: Change this to something that looks better. Maybe another material or a mesh
+	#       specific to each entity type
+	var mesh:MeshInstance = get_child(0).get_child(0)
+	var entity_size:Vector3 = mesh.get_transformed_aabb().size
+	var circle_size:float = max(entity_size.x, entity_size.z)
 
-func change_health(health:int, type:int):
+	var select_circle_scene = load("res://UI/SelectCircle.glb")
+	select_circle = select_circle_scene.instance()
+	select_circle.scale = Vector3(circle_size, 1, circle_size)
+	select_circle.set_visible(false)
+	add_child(select_circle, true)
+
+func check_cost_and_resources() -> bool:
+	for i in range(affiliation.resources.size()):
+		if cost[i] > affiliation.resources[i]:
+			return false
+	return true
+
+func change_health(health:int, type:int) -> void:
 	self.health -= health * damage_type_multipliers[type]
 
 	if health < 0:
 		die()
 		self.free()
 	elif health > maximum_health:
-		# Special behaviour when over maximum health?
+		# TODO: Special behaviour when over maximum health?
 		pass
 
-# Override methods for functionality specific to specific types of entities
+func select() -> void:
+	if selected:
+		return # Entity is already selected
+	selected = true
+	select_circle.set_visible(true)
+
+func deselect() -> void:
+	if not selected:
+		return # Entity was not selected
+	selected = false
+	select_circle.set_visible(false)
+
+
+# =================================================================================================
+# =========== Override methods for functionality specific to specific types of entities ===========
+# =================================================================================================
 
 func set_cost() -> void:
 	pass

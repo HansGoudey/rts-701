@@ -3,6 +3,7 @@ extends Spatial
 # Navigation Node (For intersecting with terrain)
 var navigation:Navigation = null
 var navmesh_id:int = 0
+var navigation_mesh:NavigationMesh = null # Shared with all units
 
 # Resource Generation
 const MAX_MAP_HEIGHT:float = 1000.0 # For intersections with terrain
@@ -21,12 +22,12 @@ func _ready():
 	# Initiate navigation information
 	navigation = $Navigation
 	var navigation_mesh_instance:NavigationMeshInstance = NavigationMeshInstance.new()
-	var navigation_mesh:NavigationMesh = NavigationMesh.new()
+	navigation_mesh = NavigationMesh.new()
 	navigation_mesh.create_from_mesh(terrain_mesh)
 
 	navmesh_id = navigation.navmesh_add(navigation_mesh, Transform.IDENTITY)
 	navigation_mesh_instance.set_enabled(true)
-	navigation.add_child(navigation_mesh_instance) # TODO: Reuse this for all units too (Don't have two)
+	navigation.add_child(navigation_mesh_instance)
 
 	if get_tree().is_network_server(): # The server should find the random locations
 		rng = RandomNumberGenerator.new()
@@ -51,6 +52,7 @@ remote func add_resource(type:int, position:Vector3, name:String = ""): # Return
 
 func randomly_place_resources():
 	var navigation_node:Navigation = get_node("/root/Main/Game/Map/Navigation")
+# warning-ignore:unused_variable
 	for i in range(num_of_resources):
 		var x = rng.randi_range(-45, 45)
 		var z = rng.randi_range(-45, 45)
