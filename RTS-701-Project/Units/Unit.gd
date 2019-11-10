@@ -27,30 +27,50 @@ func _ready():
 #	navigation.add_child(navigation_mesh_instance)
 	pass
 
-func _process(delta):
+func _physics_process(delta: float) -> void:
 	process_current_order()
 
 func process_current_order():
 	if orders.size() == 0:
+		# Default behaviour without player added orders
+
+		# Choose the closest target within a constant passive action radius
+
+		# Add an order for that target
+
 		return
 
 	var order_type:int = orders[0][0]
 	if order_type == ORDER_TYPE_NAVIGATION:
 		# Process current navigation goal (recalculate at a frequency)
 
-		# If navigation is complete, pop it from the stack
+		# If navigation is complete, pop it from the queue
 		pass
 	elif order_type == ORDER_TYPE_ATTACK:
 		# Do navigation the same as above
 
 		# Attack if within range
+
+		# If target node is destroyed / gone, pop this order from the queue
 		pass
 	else:
 		# Undefined order type
 		pass
 
+func rpc_add_navigation_order(position:Vector3):
+	add_navigation_order(position)
+	rpc("add_navigation_order", position)
+
 remote func add_navigation_order(position:Vector3):
 	orders.push_back([ORDER_TYPE_NAVIGATION, position])
+
+func rpc_clear_order_queue():
+	clear_order_queue()
+	rpc("clear_order_queue")
+
+remote func clear_order_queue():
+	orders.clear()
+
 
 # =================================================================================================
 # ============ Override methods for functionality specific to specific types of units =============
