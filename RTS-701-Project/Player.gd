@@ -107,7 +107,6 @@ func clear_selected_entities() -> void:
 
 # Select the entity under the mouse cursor to the selection
 func select_entity() -> void:
-	print("Select Entity")
 	# Linear search for the closest entity to the point projected on the terrain
 	var selection_point:Vector3 = project_mouse_to_terrain_plane()
 	var closest_distance:float = 9999999 # TODO: Figure out max float
@@ -157,13 +156,11 @@ func project_mouse_to_terrain_plane() -> Vector3:
 		return isect_line_plane_v3(to, from, Vector3(0, 0, 0), Vector3(0, 1, 0))
 
 func start_box_select() -> void:
-	print("Start Box Select")
 	# Raycast to the terrain plane (y = 0) to get the starting location
 	box_select_start = project_mouse_to_terrain_plane()
 
 # Select the entities inside the box drawn by a mouse drag
 func handle_box_select() -> void:
-	print("Handle Box Select")
 	# Raycast to the terrain to get the second box select location
 	box_select_end = project_mouse_to_terrain_plane()
 
@@ -190,7 +187,6 @@ func handle_box_select() -> void:
 			child.select()
 
 func end_box_select() -> void:
-	print("End Box Select")
 	# Replace the selection or add it to the current selection depending on modifier keys
 	if Input.is_key_pressed(KEY_SHIFT):
 		selected_entities += box_entities # TODO: Does this concatonate arrays??
@@ -226,7 +222,6 @@ func _input(event:InputEvent):
 					else:
 						mouse_down_left = true
 						if mouse_drag:
-							print("mouse_drag")
 							handle_box_select()
 				else: # Mouse just released
 					mouse_down_left = false
@@ -242,7 +237,7 @@ func _input(event:InputEvent):
 					for entity in selected_entities:
 						if entity is Unit:
 							var unit:Unit = entity as Unit
-							unit.add_navigation_order()
+							unit.add_navigation_order(project_mouse_to_terrain_plane())
 
 func rpc_set_id(id:String) -> void:
 	set_id(id)

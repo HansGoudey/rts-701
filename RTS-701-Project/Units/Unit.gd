@@ -2,24 +2,20 @@ extends Entity
 
 class_name Unit
 
-# Order List (A stack of assigned orders, holding shift should assign to the bottom)
-var orders
+# Order List (A queue of assigned orders, holding shift should assign to the bottom)
+var orders = [] # Array of list where each ty
+enum {ORDER_TYPE_NAVIGATION, ORDER_TYPE_ATTACK,}
+
+# Current navigation information
+var target_node # Target Node (Should be typed but https://github.com/godotengine/godot/issues/21461)
+var target_location:Vector3 = Vector3(0, 0, 0) # Target Location
+var navigation:Navigation = null
+var navmesh_id:int = 0
+const NAVIGATION_RECALCULATION_FREQUENCY:float = 1.0 # Seconds
 
 # Action State and Effect
 var action_countdown:float
 var active_action:int
-
-# Action Effect (Should refer to an 'action_complete' function from a type child)
-
-# Target Node (If the action applies to a node)
-var target_node # Should be typed but https://github.com/godotengine/godot/issues/21461
-
-# Target Location (If the action applies to a location)
-var target_location:Vector3 = Vector3(0, 0, 0)
-
-# Current navigation information
-#var navigation:Navigation = null
-#var navmesh_id:int = 0
 
 func _ready():
 	# Add navigation node linked to the navigation mesh from the map
@@ -32,10 +28,29 @@ func _ready():
 	pass
 
 func _process(delta):
-	pass
+	process_current_order()
 
-remote func add_navigation_order():
-	pass
+func process_current_order():
+	if orders.size() == 0:
+		return
+
+	var order_type:int = orders[0][0]
+	if order_type == ORDER_TYPE_NAVIGATION:
+		# Process current navigation goal (recalculate at a frequency)
+
+		# If navigation is complete, pop it from the stack
+		pass
+	elif order_type == ORDER_TYPE_ATTACK:
+		# Do navigation the same as above
+
+		# Attack if within range
+		pass
+	else:
+		# Undefined order type
+		pass
+
+remote func add_navigation_order(position:Vector3):
+	orders.push_back([ORDER_TYPE_NAVIGATION, position])
 
 # =================================================================================================
 # ============ Override methods for functionality specific to specific types of units =============
