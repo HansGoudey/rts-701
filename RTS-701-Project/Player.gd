@@ -237,7 +237,7 @@ func _input(event:InputEvent):
 					for entity in selected_entities:
 						if entity is Unit:
 							var unit:Unit = entity as Unit
-							unit.add_navigation_order(project_mouse_to_terrain_plane())
+							unit.rpc_add_navigation_order_position(project_mouse_to_terrain_plane())
 
 func rpc_set_id(id:String) -> void:
 	set_id(id)

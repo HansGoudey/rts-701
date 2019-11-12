@@ -3,8 +3,8 @@ extends Entity
 class_name Unit
 
 # Order List (A queue of assigned orders, holding shift should assign to the bottom)
-var orders = [] # Array of list where each ty
-enum {ORDER_TYPE_NAVIGATION, ORDER_TYPE_ATTACK,}
+var orders = [] # Array of lists where each entry contains the type and order information
+enum {ORDER_NAVIGATION_POSITION, ORDER_NAVIGATION_NODE, ORDER_TYPE_ATTACK,}
 
 # Current navigation information
 var target_node # Target Node (Should be typed but https://github.com/godotengine/godot/issues/21461)
@@ -12,6 +12,7 @@ var target_location:Vector3 = Vector3(0, 0, 0) # Target Location
 var navigation:Navigation = null
 var navmesh_id:int = 0
 const NAVIGATION_RECALCULATION_FREQUENCY:float = 1.0 # Seconds
+var navigation_recalculation_timer:Timer = null
 
 # Action State and Effect
 var action_countdown:float
@@ -28,9 +29,9 @@ func _ready():
 	pass
 
 func _physics_process(delta: float) -> void:
-	process_current_order()
+	process_current_order(delta)
 
-func process_current_order():
+func process_current_order(delta:float) -> void:
 	if orders.size() == 0:
 		# Default behaviour without player added orders
 
@@ -40,11 +41,13 @@ func process_current_order():
 
 		return
 
-	var order_type:int = orders[0][0]
-	if order_type == ORDER_TYPE_NAVIGATION:
+	var order_type:int = get_order_type()
+	if order_type == ORDER_NAVIGATION_POSITION or order_type == ORDER_NAVIGATION_NODE:
 		# Process current navigation goal (recalculate at a frequency)
+		process_navigation(delta)
 
 		# If navigation is complete, pop it from the queue
+		
 		pass
 	elif order_type == ORDER_TYPE_ATTACK:
 		# Do navigation the same as above
@@ -56,13 +59,27 @@ func process_current_order():
 	else:
 		# Undefined order type
 		pass
+		
+func process_navigation(delta:float) -> void:
+	pass
+	
+func get_navigation_target_position():
+	var order_type:int = get_order_type()
+	if order_type == ORDER_NAVIGATION_POSITION:
+		return orders[0][1]
+	elif order_type == ORDER_NAVIGATION_NODE:
+		var node = orders[0][1] as Spatial
+		return node.translation
 
-func rpc_add_navigation_order(position:Vector3):
-	add_navigation_order(position)
+func rpc_add_navigation_order_position(position:Vector3):
+	add_navigation_order_position(position)
 	rpc("add_navigation_order", position)
 
-remote func add_navigation_order(position:Vector3):
-	orders.push_back([ORDER_TYPE_NAVIGATION, position])
+remote func add_navigation_order_position(position:Vector3):
+	orders.push_back([ORDER_NAVIGATION_POSITION, position])
+	
+remote func add_navigation_order_node(node_path:String):
+	orders.push_back([ORDER_NAVIGATION_NODE, node_path])
 
 func rpc_clear_order_queue():
 	clear_order_queue()
@@ -70,6 +87,12 @@ func rpc_clear_order_queue():
 
 remote func clear_order_queue():
 	orders.clear()
+	
+func get_order_type():
+	if orders:
+		return orders[0][0]
+	else:
+		return null
 
 
 # =================================================================================================
