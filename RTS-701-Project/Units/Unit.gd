@@ -7,12 +7,18 @@ var orders = [] # Array of lists where each entry contains the type and order in
 enum {ORDER_NAVIGATION_POSITION, ORDER_NAVIGATION_NODE, ORDER_TYPE_ATTACK,}
 
 # Current navigation information
-var target_node # Target Node (Should be typed but https://github.com/godotengine/godot/issues/21461)
-var target_location:Vector3 = Vector3(0, 0, 0) # Target Location
+#var target_node # Target Node (Should be typed but https://github.com/godotengine/godot/issues/21461)
+
 var navigation:Navigation = null
 var navmesh_id:int = 0
 const NAVIGATION_RECALCULATION_FREQUENCY:float = 1.0 # Seconds
 var navigation_recalculation_timer:Timer = null
+
+var move_p = false
+var initial_pos = Vector3() # initial position of the unit
+var target_location:Vector3 = Vector3(0, 0, 0) # Target Location
+var path = PoolVector3Array()
+var SPEED = 4.00 # how fast we want to move the unit
 
 # Action State and Effect
 var action_countdown:float
@@ -61,7 +67,24 @@ func process_current_order(delta:float) -> void:
 		pass
 		
 func process_navigation(delta:float) -> void:
-	pass
+	initial_pos = get_global_transform()
+	target_location = get_navigation_target_position()	
+	path = get_node('/root/Main/Game/Map/Navigation').get_simple_path(
+		initial_pos, 
+		# do not let units pile up on eachother
+		target_location+Vector3(randi()%100, randi()%100, randi()%100) 
+	)
+	if path.size() > 0:
+		move_unit(initial_pos, path[0], delta)
+
+func move_unit(from: Vector3, to: Vector3, delta:float):
+	# get unit direction from one vector to the other
+	var v = (to-from).normalized()
+	v *= delta * SPEED # scale for how much to move
+	var next_pos = initial_pos + v
+	if next_pos.distance_squared_to(from) < 9:
+		path.remove(0)
+		initial_pos = next_pos
 	
 func get_navigation_target_position():
 	var order_type:int = get_order_type()
