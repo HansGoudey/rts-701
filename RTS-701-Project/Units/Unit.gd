@@ -81,6 +81,8 @@ func process_navigation(delta:float) -> void:
 		navigation_processed = true
 	if path.size() > 0:
 		move_unit(initial_pos, path[0], delta)
+	else:
+		navigation_processed = false
 
 func get_z() -> float:
 	var mouse_position:Vector2 = get_viewport().get_mouse_position()
