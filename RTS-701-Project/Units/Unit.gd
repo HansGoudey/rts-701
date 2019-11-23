@@ -14,7 +14,7 @@ var navmesh_id:int = 0
 const NAVIGATION_RECALCULATION_FREQUENCY:float = 1.0 # Seconds
 var navigation_recalculation_timer:Timer = null
 
-var move_p = false
+
 var initial_pos = Vector3() # initial position of the unit
 var target_location:Vector3 = Vector3(0, 0, 0) # Target Location
 var path = PoolVector3Array()
