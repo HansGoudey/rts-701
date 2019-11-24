@@ -9,7 +9,7 @@ enum {RESOURCE0 = 0, RESOURCE1 = 1, RESOURCE2 = 2}
 func load_resource(type:int) -> void:
 	if type == RESOURCE0:
 		pass
-	elif type == RESOURCE2:
+	elif type == RESOURCE1:
 		pass
 	elif type == RESOURCE2:
 		pass

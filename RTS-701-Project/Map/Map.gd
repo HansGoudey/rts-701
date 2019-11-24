@@ -52,8 +52,20 @@ remote func add_resource(type:int, position:Vector3, name:String = ""): # Return
 
 func randomly_place_resources():
 	var navigation_node:Navigation = get_node("/root/Main/Game/Map/Navigation")
-# warning-ignore:unused_variable
-	for i in range(num_of_resources):
-		var x = rng.randi_range(-45, 45)
-		var z = rng.randi_range(-45, 45)
-		rpc_add_resource(RESOURCE1, x, z)
+	var main_node = get_node("/root/Main")
+	var affiliations = main_node.affiliations
+	var player_count = 0
+	for affiliation in affiliations:
+		player_count += 1
+	var theta = 360/player_count
+	var right_ray = 360/player_count
+	var left_ray = 0
+	for i in range(player_count):
+		# warning-ignore:unused_variable
+		for j in range(num_of_resources):
+			var r = rng.randi_range(0, 50)
+			var th = rng.randi_range(left_ray, right_ray)
+			var coords = polar2cartesian(r, th)
+			left_ray += theta
+			right_ray += theta
+			rpc_add_resource(RESOURCE1, coords[0], coords[1])
