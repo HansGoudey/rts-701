@@ -56,8 +56,7 @@ func randomly_place_resources():
 	var affiliations = main_node.affiliations
 	var player_count = 0
 	for affiliation in affiliations:
-		for player in affiliation.players:
-			player_count += 1
+		player_count += 1
 	var theta = 360/player_count
 	var right_ray = 360/player_count
 	var left_ray = 0
