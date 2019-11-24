@@ -9,15 +9,14 @@ enum {ORDER_NAVIGATION_POSITION, ORDER_NAVIGATION_NODE, ORDER_TYPE_ATTACK,}
 # Current navigation information
 #var target_node # Target Node (Should be typed but https://github.com/godotengine/godot/issues/21461)
 
-var navigation:Navigation2D = null
 var navmesh_id:int = 0
 const NAVIGATION_RECALCULATION_FREQUENCY:float = 1.0 # Seconds
 var navigation_recalculation_timer:Timer = null
 
 var navigation_processed: bool = false
-var initial_pos = Vector2() # initial position of the unit
-var target_location:Vector2 = Vector2(0, 0) # Target Location
-var path = PoolVector2Array()
+var initial_pos = Vector3() # initial position of the unit
+var target_location:Vector3 = Vector3(0, 0, 0) # Target Location
+var path = PoolVector3Array()
 var SPEED = 4.00 # how fast we want to move the unit
 
 var camera:Camera = null
@@ -28,8 +27,8 @@ var active_action:int
 
 func _ready():
 	# Add navigation node linked to the navigation mesh from the map
-	camera = get_node("Camera")
-	navigation = Navigation2D.new()
+	camera = get_node("/root/Main/Affiliation/Player1/Camera") # send the correct player in the order
+#	navigation = Navigation2D.new()
 #	var navigation_mesh_instance:NavigationMeshInstance = get_node("root/Main/Game/Map/Navigation").get_child(0)
 
 #	navmesh_id = navigation.navmesh_add(navigation_mesh, Transform.IDENTITY)
@@ -71,15 +70,20 @@ func process_current_order(delta:float) -> void:
 		
 func process_navigation(delta:float) -> void:
 	if not navigation_processed:
-		initial_pos = Vector2(get_translation().x, get_translation().y)
+		initial_pos = get_translation()
 		target_location = get_navigation_target_position()
-		path = navigation.get_simple_path(
+		var nav = get_node('/root/Main/Game/Map/Navigation') 
+		if nav:
+			print('navigation found')
+		path = nav.get_simple_path(
 			initial_pos, 
 			# do not let units pile up on eachother
-			target_location+Vector2(randi()%100, randi()%100) 
+			target_location+Vector3(randi()%100, randi()%100, randi()%100) 
 		)
+		
 		navigation_processed = true
 	if path.size() > 0:
+		print('path size still there')
 		move_unit(initial_pos, path[0], delta)
 	else:
 		navigation_processed = false
@@ -88,7 +92,7 @@ func get_z() -> float:
 	var mouse_position:Vector2 = get_viewport().get_mouse_position()
 	var from:Vector3 = camera.project_ray_origin(mouse_position)
 	var to:Vector3 = from + camera.project_ray_normal(mouse_position) * 1000
-	return navigation.get_closest_point_to_segment(from, to).z
+	return get_node('/root/Main/Game/Map/Navigation').get_closest_point_to_segment(from, to).z
 	
 #	var u:Vector3 = l2 - l1
 #	var h:Vector3 = l1 - plane_co
@@ -105,12 +109,12 @@ func move_unit(from: Vector3, to: Vector3, delta:float):
 	var v = (to-from).normalized()
 	v *= delta * SPEED # scale for how much to move
 	var next_pos = initial_pos + v
-	if next_pos.distance_squared_to(from) < 9:
-		path.remove(0)
-		initial_pos = next_pos
-		translation.x = initial_pos.x
-		translation.y = initial_pos.y
-		translation.z = get_z()
+	#if next_pos.distance_squared_to(from) < 3:
+	path.remove(0)
+	initial_pos = next_pos
+	translation.x = initial_pos.x
+	translation.y = initial_pos.y
+	translation.z = get_z()
 		
 func get_navigation_target_position():
 	var order_type:int = get_order_type()
