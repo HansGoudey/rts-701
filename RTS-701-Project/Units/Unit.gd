@@ -47,7 +47,7 @@ func process_current_order(delta:float) -> void:
 		process_navigation(delta)
 
 		# If navigation is complete, pop it from the queue
-		
+
 		pass
 	elif order_type == ORDER_TYPE_ATTACK:
 		# Do navigation the same as above
@@ -59,10 +59,10 @@ func process_current_order(delta:float) -> void:
 	else:
 		# Undefined order type
 		pass
-		
+
 func process_navigation(delta:float) -> void:
 	pass
-	
+
 func get_navigation_target_position():
 	var order_type:int = get_order_type()
 	if order_type == ORDER_NAVIGATION_POSITION:
@@ -77,7 +77,7 @@ func rpc_add_navigation_order_position(position:Vector3):
 
 remote func add_navigation_order_position(position:Vector3):
 	orders.push_back([ORDER_NAVIGATION_POSITION, position])
-	
+
 remote func add_navigation_order_node(node_path:String):
 	orders.push_back([ORDER_NAVIGATION_NODE, node_path])
 
@@ -87,7 +87,7 @@ func rpc_clear_order_queue():
 
 remote func clear_order_queue():
 	orders.clear()
-	
+
 func get_order_type():
 	if orders:
 		return orders[0][0]
