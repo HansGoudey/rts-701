@@ -28,8 +28,8 @@ const UNIT_FORMATION_SPACING:float = 2.0
 # const UNIT_MAX_PER_ROW:int = 10 # For TODO
 
 # Box Select State
-var box_select_start:Vector3 = Vector3(0, 0, 0)
-var box_select_end:Vector3 = Vector3(0, 0, 0)
+var box_select_start:Vector3 = Vector3.ZERO
+var box_select_end:Vector3 = Vector3.ZERO
 var box_entities = []
 
 # Selected Entities (group of 'Entity' nodes)
@@ -38,7 +38,7 @@ var selected_entities = [] # TODO: Maybe switch to using built in Godot groups
 
 # Camera Node (should be child of this node)
 var camera:Camera
-var camera_velocity:Vector3 = Vector3(0, 0, 0)
+var camera_velocity:Vector3 = Vector3.ZERO
 
 # Creating a new building and unit
 var create_building_mode:bool = false
@@ -143,7 +143,7 @@ static func isect_line_plane_v3(l1:Vector3, l2:Vector3, plane_co:Vector3, plane_
 		var lambda:float = - (plane_no.dot(h) / dot)
 		return l1 + u * lambda
 	else:
-		return Vector3(0, 0, 0)
+		return Vector3.ZERO
 
 func project_mouse_to_terrain() -> Vector3:
 	var mouse_position:Vector2 = get_viewport().get_mouse_position()
@@ -155,7 +155,7 @@ func project_mouse_to_terrain() -> Vector3:
 	if navigation_node:
 		return navigation_node.get_closest_point_to_segment(from, to)
 	else:
-		return isect_line_plane_v3(to, from, Vector3(0, 0, 0), Vector3(0, 1, 0))
+		return isect_line_plane_v3(to, from, Vector3.ZERO, Vector3.UP)
 
 func start_box_select() -> void:
 	# Raycast to the terrain plane (y = 0) to get the starting location
@@ -205,7 +205,7 @@ func add_navigation_orders():
 
 	# Find the average direction from the entities to the target location
 	var n_selected_units:int = 0
-	var average_direction:Vector3 = Vector3(0, 0, 0)
+	var average_direction:Vector3 = Vector3.ZERO
 	for entity in selected_entities:
 		if entity is Unit:
 			n_selected_units += 1

@@ -2,21 +2,22 @@ extends Entity
 
 class_name Unit
 
-# Debugging variables
+# Debugging Variables
 var debug_draw_navigation_path:bool = true
 var debug_im:ImmediateGeometry = null
 var debug_im_material:SpatialMaterial = null
 var debug_print_navigation_path:bool = false
 
-# Unit information set from unit type
-var speed:float = 0.0 # Speed of unit (Meters / Second)
-var action_range:float = 0.0 # Range of actions (Meters)
+# Movement Information (Set by unit types)
+var acceleration:float = 10.0 # Speed of unit (Meters / Second)
+var velocity_decay_rate:float = 0.0
+var velocity:Vector2 = Vector2.ZERO
 
 # Order List (A queue of assigned orders, holding shift should assign to the bottom)
-var orders = [] # Array of lists where each entry contains the type and order information
+var orders = [] # Array of arrays where each entry contains the type and order information
 enum {ORDER_NAVIGATION_POSITION, ORDER_NAVIGATION_NODE, ORDER_ATTACK,}
 
-# Current navigation information
+# Current Navigation Information
 var navigation:Navigation2D = null
 var navigation_terrain_3d:Navigation = null
 var target_node # Target Node (Should be typed but https://github.com/godotengine/godot/issues/21461)
@@ -29,6 +30,7 @@ const NAVIGATION_POINT_REACHED_DISTANCE:float = 0.1 # Distance to the current po
 # Action State and Effect
 var action_countdown:float
 var active_action:int
+var action_range:float = 0.0 # Range of actions (Meters)
 
 func _ready():
 	# Set up navigation variables
@@ -45,7 +47,7 @@ func _ready():
 		get_node("/root/Main/Game/Map").add_child(debug_im)
 
 	# Set specific information from unit type
-	set_speed()
+	set_movement_information()
 	set_action_range()
 
 func _physics_process(delta: float) -> void:
@@ -124,6 +126,7 @@ func process_navigation(delta:float) -> void:
 		navigation_recalculation_timer.start(NAVIGATION_RECALCULATION_FREQUENCY)
 
 	# If we reached the next navigation point, start moving to the one after
+	# TODO: Use a more sophisticated metric for determining whether a point is reached
 	if self.get_2d_translation().distance_to(path[0]) < NAVIGATION_POINT_REACHED_DISTANCE:
 		path.remove(0)
 		if path.size() == 0:
@@ -133,10 +136,14 @@ func process_navigation(delta:float) -> void:
 	# Move toward the next navigation point
 	# TODO: Maybe add smooth movement by changing the velocity?
 	var next_point:Vector2 = path[0]
-	var next_point_3d:Vector3 = Vector3(next_point.x, self.translation.y, next_point.y)
-	var next_point_direction:Vector3 = self.translation.direction_to(next_point_3d)
-	self.translation += next_point_direction * speed * delta
+	var next_point_direction:Vector2 = get_2d_translation().direction_to(next_point)
+	velocity += next_point_direction * acceleration * delta
+	velocity *= velocity_decay_rate # TODO: Decay rate shouldn't depend on framerate
+
+	self.translation.x += velocity.x
 	self.translation.y = get_terrain_height(self.translation.x, self.translation.z) + 0.5
+	self.translation.z += velocity.y
+#	self.rotation.y = tan(next_point_direction.y / next_point_direction.x)
 
 func get_terrain_height(x:float, z:float) -> float:
 	# TODO: Assert that the x, z position is within the bounds of the terrain
@@ -200,7 +207,7 @@ remote func clear_orders() -> void:
 func action_complete(type:int):
 	pass
 
-func set_speed():
+func set_movement_information():
 	pass
 
 func set_action_range():

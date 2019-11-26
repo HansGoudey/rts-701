@@ -6,13 +6,13 @@ class_name Affiliation
 var id:String = ""
 var color:Color = Color(0.0, 0.0, 0.0, 1.0)
 signal color_updated(color)
+var color_material:Material = null
 
 # Resource Counts
 var resources = []
 signal resource_0_change
 signal resource_1_change
 signal resource_2_change
-
 
 # Linked Player Nodes
 # warning-ignore:unused_class_variable
@@ -28,7 +28,7 @@ enum {UNIT_TYPE_BASIC = 0,}
 
 func _ready() -> void:
 	resources = [100, 100, 100]
-
+	color_material = null
 
 func rpc_set_color_from_hue(hue:float) -> void:
 	set_color_from_hue(hue)
