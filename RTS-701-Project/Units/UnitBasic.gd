@@ -1,8 +1,6 @@
 extends Unit
 
 func _ready():
-	maximum_health = 100
-	health = maximum_health
 	damage_type_multipliers = [1, 1, 1]
 
 func _process(delta):
@@ -33,3 +31,8 @@ func die() -> void:
 func action_complete(type:int):
 	pass
 
+func set_speed():
+	self.speed = 4.0
+
+func set_action_range():
+	self.action_range = 4.0

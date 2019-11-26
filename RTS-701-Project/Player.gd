@@ -67,11 +67,11 @@ func place_unit_pressed():
 	create_building_mode = false
 
 func add_building():
-	affiliation.rpc_add_building(affiliation.BUILDING_TYPE_BASIC, project_mouse_to_terrain_plane())
+	affiliation.rpc_add_building(affiliation.BUILDING_TYPE_BASIC, project_mouse_to_terrain())
 	create_building_mode = false
 
 func add_unit():
-	affiliation.rpc_add_unit(affiliation.UNIT_TYPE_BASIC, project_mouse_to_terrain_plane())
+	affiliation.rpc_add_unit(affiliation.UNIT_TYPE_BASIC, project_mouse_to_terrain())
 	create_unit_mode = false
 
 remote func set_camera_translation(translation:Vector3):
@@ -107,8 +107,9 @@ func clear_selected_entities() -> void:
 
 # Select the entity under the mouse cursor to the selection
 func select_entity() -> void:
+	print("Select Entity")
 	# Linear search for the closest entity to the point projected on the terrain
-	var selection_point:Vector3 = project_mouse_to_terrain_plane()
+	var selection_point:Vector3 = project_mouse_to_terrain()
 	var closest_distance:float = 9999999 # TODO: Figure out max float
 	var closest_entity:Entity = null
 	for child in affiliation.get_children():
@@ -143,7 +144,7 @@ static func isect_line_plane_v3(l1:Vector3, l2:Vector3, plane_co:Vector3, plane_
 	else:
 		return Vector3(0, 0, 0)
 
-func project_mouse_to_terrain_plane() -> Vector3:
+func project_mouse_to_terrain() -> Vector3:
 	var mouse_position:Vector2 = get_viewport().get_mouse_position()
 	var from:Vector3 = camera.project_ray_origin(mouse_position)
 	var to:Vector3 = from + camera.project_ray_normal(mouse_position) * 1000
@@ -157,12 +158,12 @@ func project_mouse_to_terrain_plane() -> Vector3:
 
 func start_box_select() -> void:
 	# Raycast to the terrain plane (y = 0) to get the starting location
-	box_select_start = project_mouse_to_terrain_plane()
+	box_select_start = project_mouse_to_terrain()
 
 # Select the entities inside the box drawn by a mouse drag
 func handle_box_select() -> void:
 	# Raycast to the terrain to get the second box select location
-	box_select_end = project_mouse_to_terrain_plane()
+	box_select_end = project_mouse_to_terrain()
 
 	# Then find all of the entities within the box
 	box_entities.clear() # Start building box_entities from scratch
@@ -237,7 +238,9 @@ func _input(event:InputEvent):
 					for entity in selected_entities:
 						if entity is Unit:
 							var unit:Unit = entity as Unit
-							unit.rpc_add_navigation_order_position(project_mouse_to_terrain_plane())
+							if not Input.is_key_pressed(KEY_SHIFT):
+								unit.rpc_clear_orders()
+							unit.rpc_add_navigation_order_position(project_mouse_to_terrain())
 
 func rpc_set_id(id:String) -> void:
 	set_id(id)

@@ -3,33 +3,64 @@ extends Spatial
 # Navigation Node (For intersecting with terrain)
 var navigation:Navigation = null
 var navmesh_id:int = 0
-var navigation_mesh:NavigationMesh = null # Shared with all units
+var navigation_mesh:NavigationMesh = null
+
+# 2D Navigation Node (For unit pathfinding)
+var navigation_2d:Navigation2D = null
+var navpoly_id:int = 0
+var navigation_polygon:NavigationPolygon = null
 
 # Resource Generation
 const MAX_MAP_HEIGHT:float = 1000.0 # For intersections with terrain
 enum {RESOURCE0 = 0, RESOURCE1 = 1, RESOURCE2 = 2}
 var num_of_resources:int = 10
-var rng:RandomNumberGenerator
+var rng:RandomNumberGenerator = null
 
 func _ready():
 	# Add the terrain
 	var terrain_file = preload("res://Map/SimpleTerrain.glb")
 	var terrain_node = terrain_file.instance()
 	add_child(terrain_node)
-#	var terrain_mesh_instance:MeshInstance = terrain_node.get_child(0)
-#	var terrain_mesh:Mesh = terrain_mesh_instance.get_mesh()
-#
-#	# Initiate navigation information
-	navigation = $Navigation
-#	var navigation_mesh_instance:NavigationMeshInstance = NavigationMeshInstance.new()
-#	navigation_mesh = NavigationMesh.new()
-#	navigation_mesh.create_from_mesh(terrain_mesh)
-#
-#	navmesh_id = navigation.navmesh_add(navigation_mesh, Transform.IDENTITY)
-#	navigation_mesh_instance.set_enabled(true)
-#	navigation.add_child(navigation_mesh_instance)
+	var terrain_mesh_instance:MeshInstance = terrain_node.get_child(0)
+	var terrain_mesh:Mesh = terrain_mesh_instance.get_mesh()
 
-	if get_tree().is_network_server(): # The server should find the random locations
+	# Initiate 3D navigation information
+	navigation = $Navigation
+	var navigation_mesh_instance:NavigationMeshInstance = NavigationMeshInstance.new()
+	navigation_mesh = NavigationMesh.new()
+	navigation_mesh.create_from_mesh(terrain_mesh)
+
+	navmesh_id = navigation.navmesh_add(navigation_mesh, Transform.IDENTITY)
+	navigation_mesh_instance.set_enabled(true)
+	navigation.add_child(navigation_mesh_instance)
+
+	# Initiate the 2D navigation node for unit navigation
+	navigation_2d = $Navigation2D
+	navigation_polygon = NavigationPolygon.new()
+	var terrain_aabb:AABB = terrain_mesh_instance.get_transformed_aabb()
+	var outline:PoolVector2Array = PoolVector2Array()
+	# Add the four corners of the terrain to the polygon
+	outline.push_back(Vector2(terrain_aabb.position.x, terrain_aabb.position.z))
+	outline.push_back(Vector2(terrain_aabb.end.x, terrain_aabb.position.z))
+	outline.push_back(Vector2(terrain_aabb.end.x, terrain_aabb.end.z))
+	outline.push_back(Vector2(terrain_aabb.position.x, terrain_aabb.end.z))
+	print("Outline:")
+	print(outline[0].x, ", ", outline[0].y)
+	print(outline[1].x, ", ", outline[1].y)
+	print(outline[2].x, ", ", outline[2].y)
+	print(outline[3].x, ", ", outline[3].y)
+	navigation_polygon.add_outline(outline)
+	navigation_polygon.make_polygons_from_outlines()
+
+	var navigation_polygon_instance:NavigationPolygonInstance = NavigationPolygonInstance.new()
+	navigation_polygon_instance.navpoly = navigation_polygon
+
+	navigation_2d.navpoly_add(navigation_polygon, Transform2D.IDENTITY)
+	navigation_polygon_instance.set_enabled(true)
+	navigation_2d.add_child(navigation_polygon_instance)
+
+
+	if get_tree().is_network_server(): # Only the server should find the random locations
 		rng = RandomNumberGenerator.new()
 		randomly_place_resources()
 
