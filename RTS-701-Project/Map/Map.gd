@@ -44,11 +44,6 @@ func _ready():
 	outline.push_back(Vector2(terrain_aabb.end.x, terrain_aabb.position.z))
 	outline.push_back(Vector2(terrain_aabb.end.x, terrain_aabb.end.z))
 	outline.push_back(Vector2(terrain_aabb.position.x, terrain_aabb.end.z))
-	print("Outline:")
-	print(outline[0].x, ", ", outline[0].y)
-	print(outline[1].x, ", ", outline[1].y)
-	print(outline[2].x, ", ", outline[2].y)
-	print(outline[3].x, ", ", outline[3].y)
 	navigation_polygon.add_outline(outline)
 	navigation_polygon.make_polygons_from_outlines()
 
