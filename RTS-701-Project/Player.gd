@@ -24,6 +24,8 @@ var mouse_drag:bool = false
 var mouse_drag_time:float = 0
 const DRAG_START_TIME:float = 0.2
 const ENTITY_SELECTION_MAX_DISTANCE:float = 4.0
+const UNIT_FORMATION_SPACING:float = 2.0
+# const UNIT_MAX_PER_ROW:int = 10 # For TODO
 
 # Box Select State
 var box_select_start:Vector3 = Vector3(0, 0, 0)
@@ -107,7 +109,6 @@ func clear_selected_entities() -> void:
 
 # Select the entity under the mouse cursor to the selection
 func select_entity() -> void:
-	print("Select Entity")
 	# Linear search for the closest entity to the point projected on the terrain
 	var selection_point:Vector3 = project_mouse_to_terrain()
 	var closest_distance:float = 9999999 # TODO: Figure out max float
@@ -198,6 +199,33 @@ func end_box_select() -> void:
 	# We're done with the box select entities array now
 	box_entities.clear()
 
+# Add navigation orders to the selected entities, putting them into a formation
+func add_navigation_orders():
+	var target_position:Vector3 = project_mouse_to_terrain()
+
+	# Find the average direction from the entities to the target location
+	var n_selected_units:int = 0
+	var average_direction:Vector3 = Vector3(0, 0, 0)
+	for entity in selected_entities:
+		if entity is Unit:
+			n_selected_units += 1
+			average_direction += entity.translation.direction_to(target_position)
+	average_direction /= n_selected_units
+
+	# Get information for the row, perpendicular to the average direction
+	var formation_row_direction:Vector3 = Vector3.DOWN.cross(average_direction)
+	var row_start:Vector3 = target_position - formation_row_direction * (n_selected_units * UNIT_FORMATION_SPACING) / 2
+	# TODO: Split units over multiple rows if there are enough units
+
+	var i:int = 0
+	for entity in selected_entities:
+		if entity is Unit:
+			var unit:Unit = entity as Unit
+			if not Input.is_key_pressed(KEY_SHIFT):
+				unit.rpc_clear_orders()
+			unit.rpc_add_navigation_order_position(row_start + formation_row_direction * (i * UNIT_FORMATION_SPACING))
+			i += 1
+
 func _process(delta):
 	if self.is_network_master():
 		camera_movement(delta)
@@ -234,13 +262,9 @@ func _input(event:InputEvent):
 					mouse_drag = false
 					mouse_drag_time = 0
 			elif event.button_index == BUTTON_RIGHT:
+				# Right click adds a navigation order to the selected units
 				if selected_entities.size() > 0:
-					for entity in selected_entities:
-						if entity is Unit:
-							var unit:Unit = entity as Unit
-							if not Input.is_key_pressed(KEY_SHIFT):
-								unit.rpc_clear_orders()
-							unit.rpc_add_navigation_order_position(project_mouse_to_terrain())
+					add_navigation_orders()
 
 func rpc_set_id(id:String) -> void:
 	set_id(id)

@@ -94,8 +94,6 @@ func calculate_navigation_path(target_location:Vector3) -> void:
 	# Get the path from the map's 2D analog
 	var from:Vector2 = navigation.get_closest_point(get_2d_translation())
 	var target_location_2d:Vector2 = Vector2(target_location.x, target_location.z)
-	# Add a random offset to the target location so units don't pile up
-#	var target_2d:Vector2 = navigation.get_closest_point(target_location_2d + Vector2(randi() % 100, randi() % 100))
 	var to:Vector2 = navigation.get_closest_point(target_location_2d)
 	path = navigation.get_simple_path(from, to)
 	# TODO: Check for error in navigation calculation
@@ -120,7 +118,6 @@ func calculate_navigation_path(target_location:Vector3) -> void:
 		print(path_string)
 
 func process_navigation(delta:float) -> void:
-#	print("Process Navigation")
 	# Recalculate navigation on a timer or if the path is empty
 	if path.size() == 0 or navigation_recalculation_timer.time_left == 0:
 		calculate_navigation_path(get_navigation_target_position())
