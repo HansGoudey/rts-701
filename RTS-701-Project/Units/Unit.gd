@@ -7,12 +7,19 @@ var orders = [] # Array of lists where each entry contains the type and order in
 enum {ORDER_NAVIGATION_POSITION, ORDER_NAVIGATION_NODE, ORDER_TYPE_ATTACK,}
 
 # Current navigation information
-var target_node # Target Node (Should be typed but https://github.com/godotengine/godot/issues/21461)
-var target_location:Vector3 = Vector3(0, 0, 0) # Target Location
-var navigation:Navigation = null
+#var target_node # Target Node (Should be typed but https://github.com/godotengine/godot/issues/21461)
+
 var navmesh_id:int = 0
 const NAVIGATION_RECALCULATION_FREQUENCY:float = 1.0 # Seconds
 var navigation_recalculation_timer:Timer = null
+
+var navigation_processed: bool = false
+var initial_pos = Vector3() # initial position of the unit
+var target_location:Vector3 = Vector3(0, 0, 0) # Target Location
+var path = PoolVector3Array()
+var SPEED = 4.00 # how fast we want to move the unit
+
+var camera:Camera = null
 
 # Action State and Effect
 var action_countdown:float
@@ -20,7 +27,8 @@ var active_action:int
 
 func _ready():
 	# Add navigation node linked to the navigation mesh from the map
-#	navigation = Navigation.new()
+	camera = get_node("/root/Main/Affiliation/Player1/Camera") # send the correct player in the order
+#	navigation = Navigation2D.new()
 #	var navigation_mesh_instance:NavigationMeshInstance = get_node("root/Main/Game/Map/Navigation").get_child(0)
 
 #	navmesh_id = navigation.navmesh_add(navigation_mesh, Transform.IDENTITY)

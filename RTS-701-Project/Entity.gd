@@ -1,5 +1,5 @@
-extends Spatial
 
+extends Spatial
 class_name Entity
 
 # Affiliation (Should be the parent of this node)

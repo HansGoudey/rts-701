@@ -16,18 +16,18 @@ func _ready():
 	var terrain_file = preload("res://Map/SimpleTerrain.glb")
 	var terrain_node = terrain_file.instance()
 	add_child(terrain_node)
-	var terrain_mesh_instance:MeshInstance = terrain_node.get_child(0)
-	var terrain_mesh:Mesh = terrain_mesh_instance.get_mesh()
-
-	# Initiate navigation information
+#	var terrain_mesh_instance:MeshInstance = terrain_node.get_child(0)
+#	var terrain_mesh:Mesh = terrain_mesh_instance.get_mesh()
+#
+#	# Initiate navigation information
 	navigation = $Navigation
-	var navigation_mesh_instance:NavigationMeshInstance = NavigationMeshInstance.new()
-	navigation_mesh = NavigationMesh.new()
-	navigation_mesh.create_from_mesh(terrain_mesh)
-
-	navmesh_id = navigation.navmesh_add(navigation_mesh, Transform.IDENTITY)
-	navigation_mesh_instance.set_enabled(true)
-	navigation.add_child(navigation_mesh_instance)
+#	var navigation_mesh_instance:NavigationMeshInstance = NavigationMeshInstance.new()
+#	navigation_mesh = NavigationMesh.new()
+#	navigation_mesh.create_from_mesh(terrain_mesh)
+#
+#	navmesh_id = navigation.navmesh_add(navigation_mesh, Transform.IDENTITY)
+#	navigation_mesh_instance.set_enabled(true)
+#	navigation.add_child(navigation_mesh_instance)
 
 	if get_tree().is_network_server(): # The server should find the random locations
 		rng = RandomNumberGenerator.new()
