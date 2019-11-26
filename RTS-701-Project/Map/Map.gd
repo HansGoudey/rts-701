@@ -85,13 +85,11 @@ func randomly_place_resources():
 	var navigation_node:Navigation = get_node("/root/Main/Game/Map/Navigation")
 	var main_node = get_node("/root/Main")
 	var affiliations = main_node.affiliations
-	var player_count = 0
-	for affiliation in affiliations:
-		player_count += 1
-	var theta = 360/player_count
-	var right_ray = 360/player_count
+	var affiliation_count = affiliations.size()
+	var theta = 360 / affiliation_count
+	var right_ray = 360 / affiliation_count
 	var left_ray = 0
-	for i in range(player_count):
+	for i in range(affiliation_count):
 		# warning-ignore:unused_variable
 		for j in range(num_of_resources):
 			var r = rng.randi_range(0, 50)
