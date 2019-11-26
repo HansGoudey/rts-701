@@ -82,6 +82,8 @@ remote func add_building(type:int, position:Vector3, name:String):
 		building_node.set_name(name)
 	add_child(building_node, true)
 
+	# TODO: Add a cut into the map's 2D navigation polygon so they are avoided for navigation
+
 	return building_node
 
 func rpc_add_unit(type:int, position:Vector3):
