@@ -1,9 +1,10 @@
 extends Building
 
 func _ready():
-	maximum_health = 100
-	health = maximum_health
-	damage_type_multipliers = [1, 1, 1]
+	self.type = Affiliation.BUILDING_TYPE_BASE
+	self.maximum_health = 100
+	self.health = maximum_health
+	self.damage_type_multipliers = [1, 1, 1]
 
 func _process(delta):
 	pass
@@ -14,13 +15,13 @@ func _process(delta):
 # =================================================================================================
 
 func initialize_health() -> void:
-	maximum_health = 100
-	health = maximum_health
+	self.maximum_health = 100
+	self.health = self.maximum_health
 
 func set_cost() -> void:
 # warning-ignore:unused_variable
-	for i in range(affiliation.resources.size()):
-		cost.append(10)
+	for i in range(self.affiliation.resources.size()):
+		self.cost.append(10)
 
 func die() -> void:
 	pass
@@ -31,4 +32,7 @@ func die() -> void:
 # =================================================================================================
 
 func production_finish() -> void:
-	pass
+	print("Production Finished")
+	var new_unit = affiliation.rpc_add_unit(production_selection, self.translation)
+	new_unit.rpc_add_navigation_order_position(self.translation + Vector3(0, 0, 2))
+	self.production_timer.stop()

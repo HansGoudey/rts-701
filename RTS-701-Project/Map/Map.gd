@@ -58,6 +58,7 @@ func _ready():
 	if get_tree().is_network_server(): # Only the server should find the random locations
 		rng = RandomNumberGenerator.new()
 		randomly_place_resources()
+		place_start_buildings()
 
 # Adds the resource of the specified type with a consistent name across peers
 func rpc_add_resource(type:int, x:float, z:float) -> void:
@@ -77,7 +78,6 @@ remote func add_resource(type:int, position:Vector3, name:String = ""): # Return
 	return resource_node
 
 func randomly_place_resources():
-	var navigation_node:Navigation = get_node("/root/Main/Game/Map/Navigation")
 	var main_node = get_node("/root/Main")
 	var affiliations = main_node.affiliations
 	var affiliation_count = affiliations.size()
@@ -93,3 +93,12 @@ func randomly_place_resources():
 			left_ray += theta
 			right_ray += theta
 			rpc_add_resource(RESOURCE1, coords[0], coords[1])
+
+func place_start_buildings():
+	var affiliations = get_node("/root/Main").affiliations
+
+	for i in range(affiliations.size()):
+		var affiliation:Affiliation = affiliations[i]
+		var location:Vector2 = polar2cartesian(30, i * (2 * PI) / affiliations.size())
+		var location_3d:Vector3 = Vector3(location.x, 0, location.y)
+		affiliation.rpc_add_building(Affiliation.BUILDING_TYPE_BASE, location_3d)

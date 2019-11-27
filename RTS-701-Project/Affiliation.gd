@@ -20,11 +20,12 @@ var players = []
 
 # Visible Area (Fog of war)
 
+# TODO: Moves types to Building and Unit classes
 # Building Types
-enum {BUILDING_TYPE_BASIC = 0,}
+enum {BUILDING_TYPE_ARMY, BUILDING_TYPE_BASE}
 
 # Unit Types
-enum {UNIT_TYPE_BASIC = 0,}
+enum {UNIT_TYPE_ARMY, UNIT_TYPE_WORKER}
 
 func _ready() -> void:
 	resources = [100, 100, 100]
@@ -67,6 +68,7 @@ func assign_player(player):
 		players = [player]
 
 # Add a building across all peers, keeping a consistent name
+# TODO: Change to 2D position
 func rpc_add_building(type:int, position:Vector3) -> void:
 	var new_building = add_building(type, position, "")
 	rpc("add_building", type, position, new_building.name)
@@ -74,8 +76,10 @@ func rpc_add_building(type:int, position:Vector3) -> void:
 # TODO: Want to use 'Building' and 'Unit' types but cyclic dependency error-- figure that out
 remote func add_building(type:int, position:Vector3, name:String):
 	var building_scene
-	if type == BUILDING_TYPE_BASIC:
-		building_scene = load("res://Buildings/BuildingBasic.tscn")
+	if type == BUILDING_TYPE_ARMY:
+		building_scene = load("res://Buildings/BuildingArmy.tscn")
+	elif type == BUILDING_TYPE_BASE:
+		building_scene = load("res://Buildings/BuildingBase.tscn")
 	var building_node = building_scene.instance()
 	building_node.translate(position)
 	if name != "":
@@ -86,14 +90,17 @@ remote func add_building(type:int, position:Vector3, name:String):
 
 	return building_node
 
-func rpc_add_unit(type:int, position:Vector3):
+func rpc_add_unit(type:int, position:Vector3): # TODO: Can't type Unit
 	var new_unit = add_unit(type, position, "")
 	rpc("add_unit", type, position, new_unit.name)
+	return new_unit
 
 remote func add_unit(type:int, position:Vector3, name:String):
 	var unit_scene
-	if type == BUILDING_TYPE_BASIC:
-		unit_scene = load("res://Units/UnitBasic.tscn")
+	if type == UNIT_TYPE_ARMY:
+		unit_scene = load("res://Units/UnitArmy.tscn")
+	elif type == UNIT_TYPE_WORKER:
+		unit_scene = load("res://Units/UnitWorker.tscn")
 	var unit_node = unit_scene.instance()
 	unit_node.translate(position)
 	if name != "":

@@ -2,12 +2,12 @@
 
 importer="scene"
 type="PackedScene"
-path="res://.import/Basic.glb-3bd7fb720ac8339172bc3cfe7136941b.scn"
+path="res://.import/Army.glb-1d21c44ccd85e3507aee54ed514c49bd.scn"
 
 [deps]
 
-source_file="res://Units/Basic.glb"
-dest_files=[ "res://.import/Basic.glb-3bd7fb720ac8339172bc3cfe7136941b.scn" ]
+source_file="res://Units/Army.glb"
+dest_files=[ "res://.import/Army.glb-1d21c44ccd85e3507aee54ed514c49bd.scn" ]
 
 [params]
 

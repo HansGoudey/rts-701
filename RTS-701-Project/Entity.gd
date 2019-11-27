@@ -26,7 +26,9 @@ func _ready():
 
 	set_cost()
 
+	# Don't create entities if there aren't enough resources
 	if not check_cost_and_resources():
+		self.queue_free()
 		return
 
 	for i in range(affiliation.resources.size()):
@@ -37,7 +39,7 @@ func _ready():
 	# Add a circle the size of the mesh below it to show when the entity is selected
 	# TODO: Change this to something that looks better. Maybe another material or a mesh
 	#       specific to each entity type
-	var mesh:MeshInstance = get_child(0).get_child(0)
+	var mesh:MeshInstance = get_child(0)
 	var entity_size:Vector3 = mesh.get_transformed_aabb().size
 	var circle_size:float = max(entity_size.x, entity_size.z)
 
@@ -67,13 +69,19 @@ func select() -> void:
 	if selected:
 		return # Entity is already selected
 	selected = true
-	select_circle.set_visible(true)
+	if select_circle:
+		select_circle.set_visible(true)
+	else:
+		print("Entity has no select circle")
 
 func deselect() -> void:
 	if not selected:
 		return # Entity was not selected
 	selected = false
-	select_circle.set_visible(false)
+	if select_circle:
+		select_circle.set_visible(false)
+	else:
+		print("Entity has no select circle")
 
 
 # =================================================================================================

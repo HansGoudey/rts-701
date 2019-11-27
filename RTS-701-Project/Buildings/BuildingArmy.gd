@@ -1,7 +1,10 @@
-extends Unit
+extends Building
 
 func _ready():
-	self.damage_type_multipliers = [1, 1, 1]
+	type = Affiliation.BUILDING_TYPE_ARMY
+	maximum_health = 100
+	health = maximum_health
+	damage_type_multipliers = [1, 1, 1]
 
 func _process(delta):
 	pass
@@ -12,28 +15,24 @@ func _process(delta):
 # =================================================================================================
 
 func initialize_health() -> void:
-	self.maximum_health = 100
-	self.health = self.maximum_health
+	maximum_health = 100
+	health = maximum_health
 
-func set_cost():
+func set_cost() -> void:
 # warning-ignore:unused_variable
-	for i in range(self.affiliation.resources.size()):
-		self.cost.append(10)
+	for i in range(affiliation.resources.size()):
+		cost.append(10)
 
 func die() -> void:
 	pass
 
 
 # =================================================================================================
-# ============================== Functions overriden from Unit Class ==============================
+# ============================ Functions overriden from Building Class ============================
 # =================================================================================================
 
-func action_complete(type:int):
-	pass
+func production_finish() -> void:
+	var new_unit:Unit = affiliation.rpc_add_unit(Affiliation.UNIT_TYPE_ARMY, self.translation)
+	new_unit.rpc_add_navigation_order_position(self.translation + Vector3(0, 0, 2))
+	self.production_timer.stop()
 
-func set_movement_information():
-	self.acceleration = 2.0
-	self.velocity_decay_rate = 0.90
-
-func set_action_range():
-	self.action_range = 4.0

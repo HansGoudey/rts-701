@@ -36,13 +36,13 @@ var box_entities = []
 # TODO: Sync selected entities with players in the same affiliation so they know what you're doing
 var selected_entities = [] # TODO: Maybe switch to using built in Godot groups
 
-# Camera Node (should be child of this node)
-var camera:Camera
+# Camera and UI Nodes (should be children)
+var camera:Camera = null
 var camera_velocity:Vector3 = Vector3.ZERO
+var game_ui:GameUI = null
 
-# Creating a new building and unit
+# Place Building Mode
 var create_building_mode:bool = false
-var create_unit_mode:bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -55,26 +55,25 @@ func _ready():
 # Load UI when game is started
 func load_ui():
 	var ui_scene = load("res://UI/GameUI.tscn")
-	var game_ui:Control = ui_scene.instance()
+	game_ui = ui_scene.instance()
 	add_child(game_ui)
 	assert(game_ui.connect("place_building_pressed", self, "place_building_pressed") == OK)
-	assert(game_ui.connect("place_unit_pressed", self, "place_unit_pressed") == OK)
+	assert(game_ui.connect("building_production_start", self, "building_production_start") == OK)
+	game_ui.hide_actions_panels()
 
 func place_building_pressed():
 	create_building_mode = true
-	create_unit_mode = false
 
-func place_unit_pressed():
-	create_unit_mode = true
-	create_building_mode = false
+func building_production_start(building_type:int, production_type:int):
+	for entity in selected_entities:
+		if entity is Building:
+			var building = entity as Building
+			if building.type == building_type:
+				building.rpc_start_production(production_type)
 
 func add_building():
-	affiliation.rpc_add_building(affiliation.BUILDING_TYPE_BASIC, project_mouse_to_terrain())
+	affiliation.rpc_add_building(affiliation.BUILDING_TYPE_ARMY, project_mouse_to_terrain())
 	create_building_mode = false
-
-func add_unit():
-	affiliation.rpc_add_unit(affiliation.UNIT_TYPE_BASIC, project_mouse_to_terrain())
-	create_unit_mode = false
 
 remote func set_camera_translation(translation:Vector3):
 	camera.translation = translation
@@ -89,9 +88,9 @@ func camera_movement(delta:float):
 		camera_velocity.z -= delta * camera_acceleration
 	if Input.is_action_pressed("camera_backward"):
 		camera_velocity.z += delta * camera_acceleration
-	if Input.is_action_pressed("camera_up"):
+	if Input.is_action_pressed("camera_up") and camera.translation.y < 30:
 		camera_velocity.y += delta * camera_acceleration
-	if Input.is_action_pressed("camera_down"):
+	if Input.is_action_pressed("camera_down") and camera.translation.y > 7.5:
 		camera_velocity.y -= delta * camera_acceleration
 
 	# Smoothly lower the camera velocity
@@ -239,32 +238,69 @@ func _process(delta):
 			if mouse_drag:
 				handle_box_select() # Put this here so the selection updates when there are no mouse events
 
+func set_ui_panel():
+	if not game_ui:
+		return
+	if selected_entities.size() == 0:
+		game_ui.set_panel_visibility(GameUI.PANEL_NONE)
+		return
+
+	# TODO: Use tabbed UI for the actions panels, show all tabs from selection
+	var n_unit_worker:int = 0
+	var n_unit_army:int = 0
+	var n_building_base:int = 0
+	var n_building_army:int = 0
+	for entity in selected_entities:
+		if entity is Unit:
+			if entity.type == Affiliation.UNIT_TYPE_WORKER:
+				n_unit_worker += 1
+			if entity.type == Affiliation.UNIT_TYPE_ARMY:
+				n_unit_army += 1
+		if entity is Building:
+			if entity.type == Affiliation.BUILDING_TYPE_BASE:
+				n_building_base += 1
+			if entity.type == Affiliation.BUILDING_TYPE_ARMY:
+				n_building_base += 1
+
+	# Set the visible panel based on the priority of the panels
+	if n_unit_army > 0:
+		game_ui.set_panel_visibility(GameUI.PANEL_UNIT_ARMY)
+	elif n_unit_worker > 0:
+		game_ui.set_panel_visibility(GameUI.PANEL_UNIT_WORKER)
+	elif n_building_army > 0:
+		game_ui.set_panel_visibility(GameUI.PANEL_BUILDING_ARMY)
+	elif n_building_base > 0:
+		game_ui.set_panel_visibility(GameUI.PANEL_BUILDING_BASE)
+
+
 func _input(event:InputEvent):
-	if self.is_network_master():
-		if event is InputEventMouseButton:
-			if event.button_index == BUTTON_LEFT:
-				if event.pressed: # Mouse just pressed or has been pressed
-					if create_building_mode:
-						add_building()
-					elif create_unit_mode:
-						add_unit()
-					else:
-						mouse_down_left = true
-						if mouse_drag:
-							handle_box_select()
-				else: # Mouse just released
-					mouse_down_left = false
-					# If the mouse wasn't dragging and it was released, run select
+	if not self.is_network_master():
+		return
+	if event is InputEventMouseButton:
+		if event.button_index == BUTTON_LEFT:
+			if event.pressed: # Mouse just pressed or has been pressed
+				if create_building_mode:
+					add_building()
+				else:
+					mouse_down_left = true
 					if mouse_drag:
-						end_box_select()
-					else:
-						select_entity()
-					mouse_drag = false
-					mouse_drag_time = 0
-			elif event.button_index == BUTTON_RIGHT:
-				# Right click adds a navigation order to the selected units
-				if selected_entities.size() > 0:
-					add_navigation_orders()
+						handle_box_select()
+			else: # Mouse just released
+				mouse_down_left = false
+				# If the mouse wasn't dragging and it was released, run select
+				if mouse_drag:
+					end_box_select()
+				else:
+					select_entity()
+				mouse_drag = false
+				mouse_drag_time = 0
+
+			# Show the UI corresponding to the selection
+			set_ui_panel()
+		elif event.button_index == BUTTON_RIGHT:
+			# Right click adds a navigation order to the selected units
+			if selected_entities.size() > 0:
+				add_navigation_orders()
 
 func rpc_set_id(id:String) -> void:
 	set_id(id)

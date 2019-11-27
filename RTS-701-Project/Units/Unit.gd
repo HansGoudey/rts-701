@@ -3,10 +3,13 @@ extends Entity
 class_name Unit
 
 # Debugging Variables
-var debug_draw_navigation_path:bool = true
+var debug_draw_navigation_path:bool = false
 var debug_im:ImmediateGeometry = null
 var debug_im_material:SpatialMaterial = null
 var debug_print_navigation_path:bool = false
+
+# Unit Type
+var type:int = 0
 
 # Movement Information (Set by unit types)
 var acceleration:float = 10.0 # Speed of unit (Meters / Second)

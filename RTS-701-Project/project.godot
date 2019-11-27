@@ -24,6 +24,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://Entity.gd"
 }, {
+"base": "Control",
+"class": "GameUI",
+"language": "GDScript",
+"path": "res://UI/GameUI.gd"
+}, {
 "base": "Node",
 "class": "Main",
 "language": "GDScript",
@@ -58,6 +63,7 @@ _global_script_class_icons={
 "Affiliation": "",
 "Building": "",
 "Entity": "",
+"GameUI": "",
 "Main": "",
 "MapResource": "",
 "Order": "",
