@@ -43,6 +43,7 @@ var game_ui:GameUI = null
 
 # Place Building Mode
 var create_building_mode:bool = false
+var create_building_type:int = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -61,8 +62,9 @@ func load_ui():
 	assert(game_ui.connect("building_production_start", self, "building_production_start") == OK)
 	game_ui.hide_actions_panels()
 
-func place_building_pressed():
+func place_building_pressed(type:int):
 	create_building_mode = true
+	create_building_type = type
 
 func building_production_start(building_type:int, production_type:int):
 	for entity in selected_entities:
@@ -72,7 +74,7 @@ func building_production_start(building_type:int, production_type:int):
 				building.rpc_start_production(production_type)
 
 func add_building():
-	affiliation.rpc_add_building(affiliation.BUILDING_TYPE_ARMY, project_mouse_to_terrain())
+	affiliation.rpc_add_building(create_building_type, project_mouse_to_terrain())
 	create_building_mode = false
 
 remote func set_camera_translation(translation:Vector3):

@@ -6,7 +6,7 @@ class_name Affiliation
 var id:String = ""
 var color:Color = Color(0.0, 0.0, 0.0, 1.0)
 signal color_updated(color)
-var color_material:Material = null
+var color_material:SpatialMaterial = null
 
 # Resource Counts
 var resources = []
@@ -20,7 +20,6 @@ var players = []
 
 # Visible Area (Fog of war)
 
-# TODO: Moves types to Building and Unit classes
 # Building Types
 enum {BUILDING_TYPE_ARMY, BUILDING_TYPE_BASE}
 
@@ -28,8 +27,10 @@ enum {BUILDING_TYPE_ARMY, BUILDING_TYPE_BASE}
 enum {UNIT_TYPE_ARMY, UNIT_TYPE_WORKER}
 
 func _ready() -> void:
+	print("Affiliation Ready")
 	resources = [100, 100, 100]
-	color_material = null
+	color_material = SpatialMaterial.new()
+	color_material.albedo_color = color
 
 func rpc_set_color_from_hue(hue:float) -> void:
 	set_color_from_hue(hue)
@@ -42,6 +43,7 @@ remote func set_color_from_hue(hue:float) -> void:
 remote func set_color(color:Color) -> void:
 	emit_signal("color_updated", color)
 	self.color = color
+	color_material.albedo_color = color
 
 remote func set_id(id:String) -> void:
 	self.id = id

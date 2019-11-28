@@ -56,18 +56,23 @@ func set_panel_visibility(type:int):
 		visible_panel.set_visible(false)
 	if type == PANEL_NONE:
 		visible_panel_type = PANEL_NONE
+		visible_panel = null
 	elif type == PANEL_UNIT_WORKER:
 		$ActionsWorker.set_visible(true)
 		visible_panel_type = PANEL_UNIT_WORKER
+		visible_panel = $ActionsWorker
 	elif type == PANEL_UNIT_ARMY:
 		$ActionsArmyUnit.set_visible(true)
 		visible_panel_type = PANEL_UNIT_ARMY
+		visible_panel = $ActionsArmyUnit
 	elif type == PANEL_BUILDING_BASE:
 		$ActionsBase.set_visible(true)
 		visible_panel_type = PANEL_BUILDING_BASE
+		visible_panel = $ActionsBase
 	elif type == PANEL_BUILDING_ARMY:
 		$ActionsArmy.set_visible(true)
 		visible_panel_type = PANEL_BUILDING_ARMY
+		visible_panel = $ActionsArmy
 
 func place_building_pressed(type:int):
 	emit_signal("place_building_pressed", type)

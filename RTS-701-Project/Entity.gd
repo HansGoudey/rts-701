@@ -49,6 +49,8 @@ func _ready():
 	select_circle.set_visible(false)
 	add_child(select_circle, true)
 
+	set_affiliation_material()
+
 func check_cost_and_resources() -> bool:
 	for i in range(affiliation.resources.size()):
 		if cost[i] > affiliation.resources[i]:
@@ -95,4 +97,7 @@ func initialize_health() -> void:
 	pass
 
 func die() -> void:
+	pass
+
+func set_affiliation_material() -> void:
 	pass

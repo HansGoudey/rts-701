@@ -26,6 +26,9 @@ func set_cost() -> void:
 func die() -> void:
 	pass
 
+func set_affiliation_material() -> void:
+	$Cube.set_material_override(affiliation.color_material)
+
 
 # =================================================================================================
 # ============================ Functions overriden from Building Class ============================
