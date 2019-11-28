@@ -1,8 +1,8 @@
 extends Unit
 
 func _ready():
-	type = Affiliation.UNIT_TYPE_ARMY
-	damage_type_multipliers = [1, 1, 1]
+	self.type = Affiliation.UNIT_TYPE_ARMY
+	self.damage_type_multipliers = [1, 1, 1]
 
 func _process(delta):
 	pass

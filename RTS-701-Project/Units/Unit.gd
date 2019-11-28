@@ -59,7 +59,7 @@ func _physics_process(delta: float) -> void:
 func process_current_order(delta:float) -> void:
 	if orders.size() == 0:
 		# Default behaviour without player added orders
-
+		default_action()
 		# Choose the closest target within a constant passive action radius
 
 		# Add an order for that target
@@ -206,6 +206,12 @@ remote func clear_orders() -> void:
 # =================================================================================================
 # ============ Override methods for functionality specific to specific types of units =============
 # =================================================================================================
+
+func default_action():
+	pass
+
+func attack(node):
+	pass
 
 func action_complete(type:int):
 	pass
