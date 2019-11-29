@@ -7,12 +7,15 @@ var health:int
 enum {RESOURCE0 = 0, RESOURCE1 = 1, RESOURCE2 = 2}
 
 func load_resource(type:int) -> void:
+	var resource_scene
 	if type == RESOURCE0:
-		pass
+		resource_scene = load("res://Resources/1.glb")
 	elif type == RESOURCE1:
-		pass
+		resource_scene = load("res://Resources/2.glb")
 	elif type == RESOURCE2:
-		pass
+		resource_scene = load("res://Resources/3.glb")
+	var resource_mesh = resource_scene.instance()
+	add_child(resource_mesh)
 
 # Returns an amount harvested from the resource
 func harvest(damage:int) -> int:
