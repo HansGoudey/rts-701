@@ -9,6 +9,7 @@ var navigation_mesh:NavigationMesh = null
 var navigation_2d:Navigation2D = null
 var navpoly_id:int = 0
 var navigation_polygon:NavigationPolygon = null
+var navigation_polygon_instance:NavigationPolygonInstance = null
 
 # Resource Generation
 const MAX_MAP_HEIGHT:float = 1000.0 # For intersections with terrain
@@ -47,18 +48,28 @@ func _ready():
 	navigation_polygon.add_outline(outline)
 	navigation_polygon.make_polygons_from_outlines()
 
-	var navigation_polygon_instance:NavigationPolygonInstance = NavigationPolygonInstance.new()
+	navigation_polygon_instance = NavigationPolygonInstance.new()
 	navigation_polygon_instance.navpoly = navigation_polygon
 
 	navigation_2d.navpoly_add(navigation_polygon, Transform2D.IDENTITY)
 	navigation_polygon_instance.set_enabled(true)
 	navigation_2d.add_child(navigation_polygon_instance)
 
-
 	if get_tree().is_network_server(): # Only the server should find the random locations
 		rng = RandomNumberGenerator.new()
 		randomly_place_resources()
 		place_start_buildings()
+
+func remove_building_rectangle(position:Vector2, size:float):
+	print("Remove Building Rectangle")
+	size *= 0.5
+	var outline:PoolVector2Array = PoolVector2Array([Vector2.ZERO, Vector2.ZERO, Vector2.ZERO, Vector2.ZERO])
+	outline[0] = Vector2(position.x - size, position.y - size)
+	outline[0] = Vector2(position.x + size, position.y - size)
+	outline[0] = Vector2(position.x + size, position.y + size)
+	outline[0] = Vector2(position.x - size, position.y + size)
+	navigation_polygon.add_outline(outline)
+	navigation_polygon_instance.navpoly = navigation_polygon
 
 # Adds the resource of the specified type with a consistent name across peers
 func rpc_add_resource(type:int, x:float, z:float) -> void:
