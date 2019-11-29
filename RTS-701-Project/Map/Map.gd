@@ -16,9 +16,6 @@ enum {RESOURCE0 = 0, RESOURCE1 = 1, RESOURCE2 = 2}
 var num_of_resources:int = 10
 var rng:RandomNumberGenerator = null
 
-# Keep track of resources
-var resources = []
-
 func _ready():
 	# Add the terrain
 	var terrain_file = preload("res://Map/SimpleTerrain.glb")
@@ -67,7 +64,6 @@ func _ready():
 func rpc_add_resource(type:int, x:float, z:float) -> void:
 	var position:Vector3 = navigation.get_closest_point_to_segment(Vector3(x, 0, z), Vector3(x, MAX_MAP_HEIGHT, z))
 	# add resource to list of resources
-	resources.append([type, position])
 	var new_resource_name:String = add_resource(type, position).get_name()
 	rpc("add_resource", type, position, new_resource_name)
 
@@ -76,6 +72,7 @@ remote func add_resource(type:int, position:Vector3, name:String = ""): # Return
 	var resource_node = resource_scene.instance()
 	resource_node.load_resource(type)
 	resource_node.translate(position)
+	resource_node.health = 100 # TODO: make this a global constant?
 	if name != "":
 		resource_node.set_name(name)
 	add_child(resource_node, true)

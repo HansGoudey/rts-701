@@ -2,7 +2,10 @@ extends Unit
 
 # If resource falls within the (action_range, RADIUS_MULTIPLIER*action_range]
 # the worker will place a navigation order for itself
-var RADIUS_MULTIPLIER = 2
+var RADIUS_MULTIPLIER: int = 2
+
+# Damage amount
+var DAMAGE: int = 2
 
 func _ready():
 	self.type = Affiliation.UNIT_TYPE_WORKER
@@ -36,21 +39,31 @@ func die() -> void:
 func default_action():
 	# Go though list of resources from the map and
 	# check if they are in the action_range
-	var map = get_node('/root/Main/Game/Map')
+	var map_children = get_node('/root/Main/Game/Map').get_children()
 	var sqrd_range = 2 * self.action_range
-	for resource in map.resources:
+	for child in map_children: # iterate over each node in the map
 		# TODO: unsure if the action range is a squared distance or not..
-		var dist = get_translation().distance_squared_to(resource[1])
+		if not (child is MapResource):
+			continue
+		
+		var resource_pos = child.get_translation()
+		var dist = get_translation().distance_squared_to(resource_pos)
 		if self.action_range < dist and dist <= RADIUS_MULTIPLIER*self.action_range:
-			self.orders.push_back([ORDER_NAVIGATION_POSITION, resource[1]])
+			self.orders.push_back([ORDER_NAVIGATION_POSITION, resource_pos])
 		elif dist <= self.action_range:
 			# Have the worker attack
-			print('going to attack')
-			#attack(resource[1]) # need to keep the node instead of the resource
-			#					# and position... woops
+			attack(child)
 
 func attack(node):
-	pass
+	# attack while this health is non zero and while the 
+	# target is not dead
+	while self.health > 0 and not node.is_dead():
+		node.harvest(DAMAGE)
+	
+	# check that node was not killed and not just the unit 
+	if node.is_dead():
+		affiliation.change_resource(node.type, 1) # TODO: should be based on resource type
+		node.die()
 
 func action_complete(type:int):
 	pass

@@ -29,6 +29,9 @@ func die() -> void:
 # ============================== Functions overriden from Unit Class ==============================
 # =================================================================================================
 
+func default_action():
+	
+
 func action_complete(type:int):
 	pass
 

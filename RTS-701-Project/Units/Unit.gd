@@ -58,12 +58,7 @@ func _physics_process(delta: float) -> void:
 
 func process_current_order(delta:float) -> void:
 	if orders.size() == 0:
-		# Default behaviour without player added orders
 		default_action()
-		# Choose the closest target within a constant passive action radius
-
-		# Add an order for that target
-
 		return
 
 	var order_type:int = get_order_type()
