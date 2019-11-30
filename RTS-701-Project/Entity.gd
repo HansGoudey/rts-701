@@ -60,7 +60,6 @@ func change_health(health:int, type:int) -> void:
 
 	if health < 0:
 		die()
-		self.free()
 	elif health > maximum_health:
 		# TODO: Special behaviour when over maximum health?
 		pass
@@ -87,6 +86,9 @@ func deselect() -> void:
 # =================================================================================================
 # =========== Override methods for functionality specific to specific types of entities ===========
 # =================================================================================================
+
+func is_dead() -> bool:
+	return health > 0
 
 func set_cost() -> void:
 	pass
