@@ -6,7 +6,7 @@ class_name Entity
 var affiliation:Affiliation
 
 # Health
-var health:int = 1000
+var health:int = 0
 var maximum_health:int = 100
 
 # Damage
