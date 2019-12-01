@@ -2,9 +2,15 @@ extends Spatial
 
 class_name MapResource
 
-var health:int
+var health:int = 100
 
 enum {RESOURCE0 = 0, RESOURCE1 = 1, RESOURCE2 = 2}
+
+func _ready():
+	add_to_group("targets")
+
+func get_class(): 
+	return "MapResource"
 
 func load_resource(type:int) -> void:
 	var resource_scene

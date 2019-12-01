@@ -33,7 +33,10 @@ const NAVIGATION_POINT_REACHED_DISTANCE:float = 0.1 # Distance to the current po
 # Action State and Effect
 var action_countdown:float
 var active_action:int
-var action_range:float = 0.0 # Range of actions (Meters)
+var action_range:float = 2.5 # Range of actions (Meters)
+
+# Damage constant
+var damage:int = 10
 
 func _ready():
 	# Set up navigation variables
@@ -59,12 +62,20 @@ func _physics_process(delta: float) -> void:
 func process_current_order(delta:float) -> void:
 	if orders.size() == 0:
 		# Default behaviour without player added orders
-
-		# Choose the closest target within a constant passive action radius
-
-		# Add an order for that target
-
-		return
+		var targets = get_tree().get_nodes_in_group("targets")
+		# Choose the closest target
+		if targets.size() != 0:
+			var nearest_target = targets[0]
+			for target in targets:
+				if self.translation.distance_to(target.translation) < self.translation.distance_to(nearest_target.translation):
+					nearest_target = target
+			# Add an order for that target if it is close enough:
+			if self.translation.distance_to(nearest_target.translation) < action_range:
+				orders.push_back([ORDER_ATTACK, nearest_target])
+			else:
+				return
+		else:
+			return
 
 	var order_type:int = get_order_type()
 	if order_type == ORDER_NAVIGATION_POSITION or order_type == ORDER_NAVIGATION_NODE:
@@ -76,15 +87,18 @@ func process_current_order(delta:float) -> void:
 		process_navigation(delta)
 	elif order_type == ORDER_ATTACK:
 		# If target node is destroyed / gone, pop this order from the queue
-		var target_node:Spatial = get_navigation_target_node()
-		if not target_node:
+		var target_node = get_navigation_target_node()
+		var wr
+		if target_node:
+			wr = weakref(target_node);
+		if not wr.get_ref():
 			pop_order()
-
-		# Attack if within range, if out of range process the navigation
-		if self.translation.distance_to(get_navigation_target_position()) < action_range:
-			pass
+		# Else deal damage based on the type of the target
 		else:
-			process_navigation(delta)
+			if target_node.get_class() == "MapResource":
+				target_node.harvest(damage)
+			elif target_node.get_class() == "Building":
+				target_node.change_health(damage, 1)
 	else:
 		# Undefined order type
 		print("Undefined order type")

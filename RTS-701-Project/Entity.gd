@@ -7,11 +7,11 @@ var affiliation:Affiliation
 
 # Health
 var health:int = 0
-var maximum_health:int = 0
+var maximum_health:int = 100
 
 # Damage
 enum DamageTypes {DMG_SPASH = 0, DMG_DIRECT = 1, DMG_MELEE = 2}
-var damage_type_multipliers = []
+var damage_type_multipliers = [1,1,1]
 
 # Resources
 # warning-ignore:unused_class_variable
@@ -60,9 +60,9 @@ func check_cost_and_resources() -> bool:
 func change_health(health:int, type:int) -> void:
 	self.health -= health * damage_type_multipliers[type]
 
-	if health < 0:
+	if self.health < 0:
 		die()
-		self.free()
+		self.queue_free()
 	elif health > maximum_health:
 		# TODO: Special behaviour when over maximum health?
 		pass
