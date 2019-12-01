@@ -98,7 +98,7 @@ func process_current_order(delta:float) -> void:
 			if target_node.get_class() == "MapResource":
 				target_node.harvest(damage)
 				var affiliation = self.get_parent()
-				affiliation.change_resource(0,10)
+				affiliation.change_resource(target_node.resource_type,10)
 			elif target_node.get_class() == "Building":
 				if target_node.get_parent() != self.get_parent():
 					target_node.change_health(damage, 1)
