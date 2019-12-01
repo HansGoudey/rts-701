@@ -98,10 +98,9 @@ func process_current_order(delta:float) -> void:
 			if target_node.get_class() == "MapResource":
 				target_node.harvest(damage)
 				var affiliation = self.get_parent()
-				print(target_node.)
 				affiliation.change_resource(0,10)
-#			elif target_node.get_class() == "Building":
-#				target_node.change_health(damage, 1)
+			elif target_node.get_class() == "Building":
+				target_node.change_health(damage, 1)
 	else:
 		# Undefined order type
 		print("Undefined order type")
