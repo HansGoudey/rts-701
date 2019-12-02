@@ -45,7 +45,7 @@ func default_action():
 		# TODO: unsure if the action range is a squared distance or not..
 		if not (child is MapResource):
 			continue
-		
+
 		var resource_pos = child.get_translation()
 		var dist = get_translation().distance_squared_to(resource_pos)
 		if self.action_range < dist and dist <= RADIUS_MULTIPLIER*self.action_range:
@@ -55,12 +55,12 @@ func default_action():
 			attack(child)
 
 func attack(node):
-	# attack while this health is non zero and while the 
+	# attack while this health is non zero and while the
 	# target is not dead
 	while self.health > 0 and not node.is_dead():
 		node.harvest(DAMAGE)
-	
-	# check that node was not killed and not just the unit 
+
+	# check that node was not killed and not just the unit
 	if node.is_dead():
 		affiliation.change_resource(node.type, 1) # TODO: should be based on resource type
 		node.die()

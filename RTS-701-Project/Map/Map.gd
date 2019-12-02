@@ -59,7 +59,7 @@ func _ready():
 		rng = RandomNumberGenerator.new()
 		randomly_place_resources()
 		place_start_buildings()
-		
+
 # Adds the resource of the specified type with a consistent name across peers
 func rpc_add_resource(type:int, x:float, z:float) -> void:
 	var position:Vector3 = navigation.get_closest_point_to_segment(Vector3(x, 0, z), Vector3(x, MAX_MAP_HEIGHT, z))

@@ -55,7 +55,7 @@ func default_action():
 func attack(node):
 	while self.health > 0 and not node.is_dead():
 		node.change_health(DAMAGE, 1) # TODO: should make these constants
-	
+
 	if node.is_dead():
 		node.queue_free()
 
