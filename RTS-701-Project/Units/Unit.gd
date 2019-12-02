@@ -95,6 +95,7 @@ func process_current_order(delta:float) -> void:
 			pop_order()
 		# Else deal damage based on the type of the target
 		else:
+
 			attack(target_node)
 	else:
 		# Undefined order type
