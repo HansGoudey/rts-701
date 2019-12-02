@@ -36,7 +36,10 @@ var active_action:int
 var action_range:float = 2.5 # Range of actions (Meters)
 
 # Damage constant
-var damage:int = 10
+var damage:int = 5
+
+# Damage timer
+var attack_timer:Timer = null
 
 func _ready():
 	# Set up navigation variables
@@ -55,9 +58,17 @@ func _ready():
 	# Set specific information from unit type
 	set_movement_information()
 	set_action_range()
+	
+	attack_timer = Timer.new()
+	add_child(attack_timer)
+	attack_timer.connect("timeout", self, "attack_finish")
 
 func _physics_process(delta: float) -> void:
 	process_current_order(delta)
+
+func attack_start() -> void:
+	if attack_timer.is_stopped():
+		attack_timer.start(1.0)
 
 func process_current_order(delta:float) -> void:
 	if orders.size() == 0:
@@ -87,16 +98,7 @@ func process_current_order(delta:float) -> void:
 		process_navigation(delta)
 	elif order_type == ORDER_ATTACK:
 		# If target node is destroyed / gone, pop this order from the queue
-		var target_node = get_navigation_target_node()
-		var wr
-		if target_node:
-			wr = weakref(target_node);
-		if not wr.get_ref():
-			pop_order()
-		# Else deal damage based on the type of the target
-		else:
-
-			attack(target_node)
+		attack_start()
 	else:
 		# Undefined order type
 		print("Undefined order type")
@@ -176,9 +178,11 @@ func get_navigation_target_position():
 
 func get_navigation_target_node():
 	var order_type:int = get_order_type()
-	assert(order_type == ORDER_NAVIGATION_NODE or order_type == ORDER_ATTACK)
-	var node = orders[0][1]
-	return node
+	if order_type == ORDER_NAVIGATION_NODE or order_type == ORDER_ATTACK:
+		var node = orders[0][1]
+		return node
+	else:
+		return null
 
 func get_order_type() -> int:
 	if orders:
@@ -219,7 +223,7 @@ remote func clear_orders() -> void:
 # ============ Override methods for functionality specific to specific types of units =============
 # =================================================================================================
 
-func attack(node):
+func attack_finish():
 	pass
 
 func action_complete(type:int):

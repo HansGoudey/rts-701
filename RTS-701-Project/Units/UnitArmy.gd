@@ -24,9 +24,22 @@ func set_cost():
 func die() -> void:
 	pass
 
-func attack(node):
-	if node is Entity and node.get_parent() != get_parent():
-		node.change_health(damage, 1)
+func attack():
+	var target_node = get_navigation_target_node()
+	if not target_node:
+		pop_order()
+	else:
+		var wr
+		if target_node:
+			wr = weakref(target_node);
+		if not wr.get_ref():
+			pop_order()
+		# Else deal damage based on the type of the target
+		else:
+			if target_node is Entity and target_node.get_parent() != get_parent():
+				target_node.change_health(damage, 1)
+	attack_timer.stop()
+	
 
 # =================================================================================================
 # ============================== Functions overriden from Unit Class ==============================

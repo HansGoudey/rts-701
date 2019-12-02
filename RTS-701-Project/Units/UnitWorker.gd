@@ -39,7 +39,19 @@ func set_movement_information():
 func set_action_range():
 	self.action_range = 4.0
 
-func attack(node):
-	if node is MapResource:
-		affiliation.change_resource(node.resource_type, 10)
-		node.harvest(damage)
+func attack_finish():
+	var target_node = get_navigation_target_node()
+	if not target_node:
+		pop_order()
+	else:
+		var wr
+		if target_node:
+			wr = weakref(target_node);
+		if not wr.get_ref():
+			pop_order()
+		# Else deal damage based on the type of the target
+		else:
+			if target_node is MapResource:
+				affiliation.change_resource(target_node.resource_type, damage)
+				target_node.harvest(damage)
+	attack_timer.stop()
