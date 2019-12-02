@@ -2,8 +2,6 @@ extends Building
 
 func _ready():
 	self.type = Affiliation.BUILDING_TYPE_BASE
-	self.maximum_health = 100
-	self.health = maximum_health
 	self.damage_type_multipliers = [1, 1, 1]
 
 func _process(delta):

@@ -1,10 +1,8 @@
 extends Building
 
 func _ready():
-	type = Affiliation.BUILDING_TYPE_ARMY
-	maximum_health = 100
-	health = maximum_health
-	damage_type_multipliers = [1, 1, 1]
+	self.type = Affiliation.BUILDING_TYPE_ARMY
+	self.damage_type_multipliers = [1, 1, 1]
 
 func _process(delta):
 	pass
@@ -15,16 +13,19 @@ func _process(delta):
 # =================================================================================================
 
 func initialize_health() -> void:
-	maximum_health = 100
-	health = maximum_health
+	self.maximum_health = 100
+	self.health = self.maximum_health
 
 func set_cost() -> void:
 # warning-ignore:unused_variable
-	for i in range(affiliation.resources.size()):
-		cost.append(10)
+	for i in range(self.affiliation.resources.size()):
+		self.cost.append(10)
 
 func die() -> void:
 	pass
+	
+func set_affiliation_material() -> void:
+	$Cube.set_material_override(affiliation.color_material)
 
 
 # =================================================================================================
@@ -35,4 +36,3 @@ func production_finish() -> void:
 	var new_unit:Unit = affiliation.rpc_add_unit(Affiliation.UNIT_TYPE_ARMY, self.translation)
 	new_unit.rpc_add_navigation_order_position(self.translation + Vector3(0, 0, 2))
 	self.production_timer.stop()
-

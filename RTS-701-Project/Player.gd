@@ -256,13 +256,13 @@ func set_ui_panel():
 		if entity is Unit:
 			if entity.type == Affiliation.UNIT_TYPE_WORKER:
 				n_unit_worker += 1
-			if entity.type == Affiliation.UNIT_TYPE_ARMY:
+			elif entity.type == Affiliation.UNIT_TYPE_ARMY:
 				n_unit_army += 1
-		if entity is Building:
+		elif entity is Building:
 			if entity.type == Affiliation.BUILDING_TYPE_BASE:
 				n_building_base += 1
-			if entity.type == Affiliation.BUILDING_TYPE_ARMY:
-				n_building_base += 1
+			elif entity.type == Affiliation.BUILDING_TYPE_ARMY:
+				n_building_army += 1
 
 	# Set the visible panel based on the priority of the panels
 	if n_unit_army > 0:
