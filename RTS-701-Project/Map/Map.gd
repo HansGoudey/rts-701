@@ -97,14 +97,14 @@ func randomly_place_resources():
 	var left_ray = 0
 	for i in range(affiliation_count):
 		# warning-ignore:unused_variable
-		for j in range(3):
+		for type in range(3):
 			for k in range(num_of_resources):
 				var r = rng.randi_range(0, 50)
 				var th = rng.randi_range(left_ray, right_ray)
 				var coords = polar2cartesian(r, th)
 				left_ray += theta
 				right_ray += theta
-				rpc_add_resource(j, coords[0], coords[1])
+				rpc_add_resource(type, coords[0], coords[1])
 
 func place_start_buildings(): 
 	var affiliations = get_node("/root/Main").affiliations

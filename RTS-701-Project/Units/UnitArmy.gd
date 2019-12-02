@@ -23,6 +23,7 @@ func set_cost():
 
 func die() -> void:
 	pass
+<<<<<<< HEAD
 
 func attack():
 	var target_node = get_navigation_target_node()
@@ -40,6 +41,11 @@ func attack():
 				target_node.change_health(damage, 1)
 	attack_timer.stop()
 	
+=======
+		
+func set_affiliation_material() -> void:
+	get_child(0).set_material_override(affiliation.color_material)
+>>>>>>> 9aa03abfeee74a92e42012826fabff23191bdb03
 
 # =================================================================================================
 # ============================== Functions overriden from Unit Class ==============================
@@ -54,3 +60,7 @@ func set_movement_information():
 
 func set_action_range():
 	self.action_range = 4.0
+	
+func attack(node):
+	if node is Entity and node.get_parent() != get_parent():
+		node.change_health(damage, 1)

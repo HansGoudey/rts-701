@@ -23,6 +23,9 @@ func set_cost():
 
 func die() -> void:
 	pass
+	
+func set_affiliation_material() -> void:
+	get_child(0).set_material_override(affiliation.color_material)
 
 
 # =================================================================================================
@@ -33,8 +36,8 @@ func action_complete(type:int):
 	pass
 
 func set_movement_information():
-	self.acceleration = 2.0
-	self.velocity_decay_rate = 0.90
+	self.acceleration = 1.0
+	self.velocity_decay_rate = 0.85
 
 func set_action_range():
 	self.action_range = 4.0

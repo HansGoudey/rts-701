@@ -21,10 +21,10 @@ var players = []
 # Visible Area (Fog of war)
 
 # Building Types
-enum {BUILDING_TYPE_ARMY, BUILDING_TYPE_BASE}
+enum {BUILDING_TYPE_ARMY = 0, BUILDING_TYPE_BASE = 1}
 
 # Unit Types
-enum {UNIT_TYPE_ARMY, UNIT_TYPE_WORKER}
+enum {UNIT_TYPE_ARMY = 0, UNIT_TYPE_WORKER = 1}
 
 func _ready() -> void:
 	print("Affiliation Ready")
