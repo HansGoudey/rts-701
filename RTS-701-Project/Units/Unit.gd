@@ -95,13 +95,7 @@ func process_current_order(delta:float) -> void:
 			pop_order()
 		# Else deal damage based on the type of the target
 		else:
-			if target_node.get_class() == "MapResource":
-				target_node.harvest(damage)
-				var affiliation = self.get_parent()
-				affiliation.change_resource(target_node.resource_type,10)
-			elif target_node.get_class() == "Building":
-				if target_node.get_parent() != self.get_parent():
-					target_node.change_health(damage, 1)
+			attack(target_node)
 	else:
 		# Undefined order type
 		print("Undefined order type")
@@ -223,6 +217,9 @@ remote func clear_orders() -> void:
 # =================================================================================================
 # ============ Override methods for functionality specific to specific types of units =============
 # =================================================================================================
+
+func attack(node):
+	pass
 
 func action_complete(type:int):
 	pass
