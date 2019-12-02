@@ -24,6 +24,9 @@ func set_cost():
 func die() -> void:
 	pass
 
+func attack(node):
+	if node is Entity and node.get_parent() != get_parent():
+		node.change_health(damage, 1)
 
 # =================================================================================================
 # ============================== Functions overriden from Unit Class ==============================

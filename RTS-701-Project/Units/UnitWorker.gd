@@ -38,3 +38,8 @@ func set_movement_information():
 
 func set_action_range():
 	self.action_range = 4.0
+
+func attack(node):
+	if node is MapResource:
+		affiliation.change_resource(node.resource_type, 10)
+		node.harvest(damage)
