@@ -95,11 +95,11 @@ func process_current_order(delta:float) -> void:
 			pop_order()
 		# Else deal damage based on the type of the target
 		else:
-			if target_node.get_class() == "MapResource":
+			if target_node is MapResource:
 				target_node.harvest(damage)
 				var affiliation = self.get_parent()
 				affiliation.change_resource(target_node.resource_type,10)
-			elif target_node.get_class() == "Building":
+			elif target_node is Building:
 				if target_node.get_parent() != self.get_parent():
 					target_node.change_health(damage, 1)
 	else:

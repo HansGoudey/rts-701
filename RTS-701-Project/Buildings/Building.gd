@@ -17,9 +17,6 @@ func _ready():
 	production_timer.connect("timeout", self, "production_finish")
 	add_to_group("targets")
 
-func get_class(): 
-	return "Building"
-
 func _process(delta):
 	pass
 
