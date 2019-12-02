@@ -31,11 +31,14 @@ func _ready():
 	assert(get_tree().connect("connected_to_server", self, "_connected_ok") == OK)
 	assert(get_tree().connect("connection_failed", self, "_connected_fail") == OK)
 	assert(get_tree().connect("server_disconnected", self, "_server_disconnected") == OK)
+	assert(self.connect("check_building_bases", self, "kick_players") == OK)
 
 	basin_instance = cmd_args_exist()
 	if basin_instance: # if run on basin set host game
 		host_game()
 
+func kick_players() -> void:
+	print('checking for players to kick')
 
 # In the lobby, start the game if all players are ready
 func check_game_start_lobby() -> void:

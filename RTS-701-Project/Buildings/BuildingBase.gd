@@ -1,5 +1,7 @@
 extends Building
 
+signal check_building_bases
+
 func _ready():
 	self.type = Affiliation.BUILDING_TYPE_BASE
 	self.maximum_health = 100
@@ -7,8 +9,8 @@ func _ready():
 	self.damage_type_multipliers = [1, 1, 1]
 
 func _process(delta):
-	pass
-
+	if health == 0:
+		die()
 
 # =================================================================================================
 # ============================= Functions overriden from Entity Class =============================
@@ -24,7 +26,13 @@ func set_cost() -> void:
 		self.cost.append(10)
 
 func die() -> void:
-	pass
+	# home base of affiliation is dead
+	# free the affiliation
+	
+	emit_signal("check_building_bases")
+	
+	
+	
 
 func set_affiliation_material() -> void:
 	$Cube.set_material_override(affiliation.color_material)
