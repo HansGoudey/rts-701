@@ -7,9 +7,16 @@ func _ready():
 	self.maximum_health = 100
 	self.health = maximum_health
 	self.damage_type_multipliers = [1, 1, 1]
+	
+	assert(self.connect("check_building_bases", get_node("/root/Main"), "kick_players") == OK)
+	
+	add_to_group(get_parent().get_name()+"bases")
+	
+var dead = false
 
 func _process(delta):
-	if health == 0:
+	
+	if health == 0 and not dead:
 		die()
 
 # =================================================================================================
@@ -28,9 +35,10 @@ func set_cost() -> void:
 func die() -> void:
 	# home base of affiliation is dead
 	# free the affiliation
-	
-	emit_signal("check_building_bases")
-	
+	dead = true
+	remove_from_group(get_parent().get_name() + "bases")
+	emit_signal("check_building_bases", get_parent())
+	self.queue_free()
 	
 	
 

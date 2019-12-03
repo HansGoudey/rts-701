@@ -318,3 +318,7 @@ func rpc_set_lobby_ready(ready:bool) -> void:
 remote func set_lobby_ready(ready:bool) -> void:
 	self.ready_to_start = ready
 	emit_signal("ready_to_start")
+
+
+func end_game():
+	var end_game_ui = load('res://UI/GameOver.tscn')

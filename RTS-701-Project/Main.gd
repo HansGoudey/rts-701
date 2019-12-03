@@ -18,6 +18,7 @@ var basin_instance:bool = false
 signal lobby_ui_update
 
 func _ready():
+	
 	# Load start UI and connect its signals
 	var ui_scene = load("res://UI/StartUI.tscn")
 	var ui_node:Control = ui_scene.instance()
@@ -31,14 +32,27 @@ func _ready():
 	assert(get_tree().connect("connected_to_server", self, "_connected_ok") == OK)
 	assert(get_tree().connect("connection_failed", self, "_connected_fail") == OK)
 	assert(get_tree().connect("server_disconnected", self, "_server_disconnected") == OK)
-	assert(self.connect("check_building_bases", self, "kick_players") == OK)
+	
 
 	basin_instance = cmd_args_exist()
 	if basin_instance: # if run on basin set host game
 		host_game()
 
-func kick_players() -> void:
-	print('checking for players to kick')
+func kick_players(dead_base_affiliation) -> void:
+	
+	if get_tree().is_network_server():
+		# this should always be true but better safe than sorry
+		if dead_base_affiliation is Affiliation:
+			# TODO: make the bases thing a constant
+			var grp_name: String = dead_base_affiliation.get_name() + "bases"
+			if get_tree().get_nodes_in_group(grp_name).size() == 0:
+				for player in player_info.values():
+					if player.get_parent() == dead_base_affiliation:
+						player.end_game()
+						
+				dead_base_affiliation.queue_free()
+		
+		
 
 # In the lobby, start the game if all players are ready
 func check_game_start_lobby() -> void:

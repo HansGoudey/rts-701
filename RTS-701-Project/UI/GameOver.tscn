@@ -1,0 +1,28 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Fonts/dmserif_display100.tres" type="DynamicFont" id=1]
+[ext_resource path="res://Fonts/new_dynamicfont50.tres" type="DynamicFont" id=2]
+
+[node name="Control" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 2.0
+margin_top = 5.0
+
+[node name="Label" type="Label" parent="."]
+margin_left = 721.175
+margin_top = 432.833
+margin_right = 1210.18
+margin_bottom = 617.833
+custom_fonts/font = ExtResource( 1 )
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+text = "You Lose!"
+percent_visible = -0.125
+
+[node name="Label2" type="Label" parent="."]
+margin_left = 748.263
+margin_top = 617.263
+margin_right = 1173.26
+margin_bottom = 686.263
+custom_fonts/font = ExtResource( 2 )
+text = "Hit Exit and restart"
