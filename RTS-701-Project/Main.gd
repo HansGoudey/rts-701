@@ -39,6 +39,9 @@ func _ready():
 
 # In the lobby, start the game if all players are ready
 func check_game_start_lobby() -> void:
+	if not get_tree().is_network_server():
+		return
+	
 	var all_players_ready:bool = true
 	for player_node in player_info.values():
 
@@ -61,8 +64,6 @@ func rpc_assign_player_to_affiliation(player:Player, affiliation:Affiliation) ->
 	rpc("assign_player_to_affiliation", player_path, affiliation_path)
 
 remote func assign_player_to_affiliation(player_path:String, affiliation_path:String) -> void:
-
-
 	# Get the nodes from the paths
 	var player:Player = get_node(player_path)
 	var affiliation:Affiliation = get_node(affiliation_path)
@@ -200,7 +201,7 @@ remote func start_game():
 	# Load game scene
 	var game_scene = load("res://Game.tscn")
 	var game_node = game_scene.instance()
-	add_child(game_node)
+	add_child(game_node, true)
 	$LobbyUI.queue_free()
 
 	# Add the game UI for the player

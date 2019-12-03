@@ -89,7 +89,8 @@ remote func add_building(type:int, position:Vector3, name:String):
 
 	# Change the navigation mesh to get navigation to go around the building
 	var building_size:float = 3.0 # TODO: Find actual size of building
-	get_node("/root/Main/Game/Map").remove_building_rectangle(Vector2(position.x, position.y), building_size)
+	if get_node("/root/Main/Game/Map"): # TODO: This check shouldn't be necessary
+		get_node("/root/Main/Game/Map").remove_building_rectangle(Vector2(position.x, position.y), building_size)
 
 	add_child(building_node, true)
 
