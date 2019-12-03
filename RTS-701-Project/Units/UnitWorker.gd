@@ -45,7 +45,7 @@ func set_action_range():
 func attack_finish():
 	var target_node = get_navigation_target_node()
 	if not target_node:
-		pop_order()
+		pass
 	else:
 		var wr
 		if target_node:
