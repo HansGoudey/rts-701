@@ -58,7 +58,7 @@ func _ready():
 	# Set specific information from unit type
 	set_movement_information()
 	set_action_range()
-	
+
 	attack_timer = Timer.new()
 	add_child(attack_timer)
 	attack_timer.connect("timeout", self, "attack_finish")

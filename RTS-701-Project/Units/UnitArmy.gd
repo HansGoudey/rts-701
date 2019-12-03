@@ -39,8 +39,8 @@ func attack():
 			if target_node is Entity and target_node.get_parent() != get_parent():
 				target_node.change_health(damage, 1)
 	attack_timer.stop()
-	
-		
+
+
 func set_affiliation_material() -> void:
 	get_child(0).set_material_override(affiliation.color_material)
 

@@ -107,7 +107,7 @@ func randomly_place_resources():
 				right_ray += theta
 				rpc_add_resource(type, coords[0], coords[1])
 
-func place_start_buildings(): 
+func place_start_buildings():
 	var affiliations = get_node("/root/Main").affiliations
 
 	for i in range(affiliations.size()):

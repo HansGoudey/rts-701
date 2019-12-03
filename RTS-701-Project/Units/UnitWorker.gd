@@ -23,7 +23,7 @@ func set_cost():
 
 func die() -> void:
 	pass
-	
+
 func set_affiliation_material() -> void:
 	get_child(0).set_material_override(affiliation.color_material)
 
