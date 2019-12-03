@@ -77,7 +77,8 @@ func rpc_add_resource(type:int, x:float, z:float) -> void:
 	var new_resource_name:String = add_resource(type, position).get_name()
 	rpc("add_resource", type, position, new_resource_name)
 
-remote func add_resource(type:int, position:Vector3, name:String = ""): # Return would be typed but cyclic dependency error
+# Return would be typed but cyclic dependency error
+remote func add_resource(type:int, position:Vector3, name:String = ""): 
 	var resource_scene = preload("res://Resources/Resource.tscn")
 	var resource_node = resource_scene.instance()
 	resource_node.load_resource(type)

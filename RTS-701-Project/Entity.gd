@@ -8,6 +8,7 @@ var affiliation:Affiliation
 # Health
 var health:int = 0
 var maximum_health:int = 100
+var health_bar:CubeMesh = null
 
 # Damage
 enum DamageTypes {DMG_SPASH = 0, DMG_DIRECT = 1, DMG_MELEE = 2}
@@ -40,7 +41,7 @@ func _ready():
 	# TODO: Change this to something that looks better. Maybe another material or a mesh
 	#       specific to each entity type
 	var mesh:MeshInstance = get_child(0)
-	var entity_size:Vector3 = mesh.get_transformed_aabb().size
+	var entity_size:Vector3 = mesh.get_transformed_aabb().size * 1.5
 	var circle_size:float = max(entity_size.x, entity_size.z)
 
 	var select_circle_scene = load("res://UI/SelectCircle.glb")
@@ -50,6 +51,12 @@ func _ready():
 	add_child(select_circle, true)
 
 	set_affiliation_material()
+	
+	# Add health bar above the entity
+#	var health_bar_mesh = CubeMesh.new()
+#	health_bar = health_bar_mesh.instance()
+#	add_child(health_bar_mesh)
+#	CubeMesh.translation = self.translation + (Vector3.UP * entity_size * 2)
 
 func check_cost_and_resources() -> bool:
 	for i in range(affiliation.resources.size()):

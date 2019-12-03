@@ -115,4 +115,3 @@ remote func add_unit(type:int, position:Vector3, name:String):
 	add_child(unit_node, true)
 
 	return unit_node
-
