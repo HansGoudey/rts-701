@@ -27,10 +27,10 @@ func _ready():
 
 	# Connect networking functions
 	assert(get_tree().connect("network_peer_connected", self, "network_peer_connected") == OK)
-	assert(get_tree().connect("network_peer_disconnected", self, "_player_disconnected") == OK)
-	assert(get_tree().connect("connected_to_server", self, "_connected_ok") == OK)
-	assert(get_tree().connect("connection_failed", self, "_connected_fail") == OK)
-	assert(get_tree().connect("server_disconnected", self, "_server_disconnected") == OK)
+	assert(get_tree().connect("network_peer_disconnected", self, "network_peer_disconnected") == OK)
+	assert(get_tree().connect("connected_to_server", self, "connected_to_server") == OK)
+	assert(get_tree().connect("connection_failed", self, "connection_failed") == OK)
+	assert(get_tree().connect("server_disconnected", self, "server_disconnected") == OK)
 
 	basin_instance = cmd_args_exist()
 	if basin_instance: # if run on basin set host game
