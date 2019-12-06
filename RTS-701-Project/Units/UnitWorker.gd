@@ -3,7 +3,7 @@ extends Unit
 func _ready():
 	type = Affiliation.UNIT_TYPE_WORKER
 	damage_type_multipliers = [1, 1, 1]
-	damage = 10
+	damage = 2
 
 #func _process(delta):
 #	pass
