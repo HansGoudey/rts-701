@@ -37,7 +37,9 @@ func _ready():
 
 	# Initiate the 2D navigation node for unit navigation
 	navigation_2d = $Navigation2D
-	navigation_polygon = NavigationPolygon.new()
+#	navigation_polygon = NavigationPolygon.new()
+	navigation_polygon_instance = NavigationPolygonInstance.new()
+	navigation_polygon_instance.navpoly = NavigationPolygon.new()
 	var terrain_aabb:AABB = terrain_mesh_instance.get_transformed_aabb()
 	var outline:PoolVector2Array = PoolVector2Array()
 	# Add the four corners of the terrain to the polygon
@@ -45,14 +47,11 @@ func _ready():
 	outline.push_back(Vector2(terrain_aabb.end.x, terrain_aabb.position.z))
 	outline.push_back(Vector2(terrain_aabb.end.x, terrain_aabb.end.z))
 	outline.push_back(Vector2(terrain_aabb.position.x, terrain_aabb.end.z))
-	navigation_polygon.add_outline(outline)
-	navigation_polygon.make_polygons_from_outlines()
+	navigation_polygon_instance.navpoly.add_outline(outline)
+	navigation_polygon_instance.navpoly.make_polygons_from_outlines()
 
-	navigation_polygon_instance = NavigationPolygonInstance.new()
-	navigation_polygon_instance.navpoly = navigation_polygon
-
-	navigation_2d.navpoly_add(navigation_polygon, Transform2D.IDENTITY)
-	navigation_polygon_instance.set_enabled(true)
+	navpoly_id = navigation_2d.navpoly_add(navigation_polygon_instance.navpoly	, Transform2D.IDENTITY)
+	navigation_polygon_instance.enabled = true
 	navigation_2d.add_child(navigation_polygon_instance)
 
 	if get_tree().is_network_server(): # Only the server should find the random locations
@@ -60,16 +59,24 @@ func _ready():
 		randomly_place_resources()
 		place_start_buildings()
 
-func remove_building_rectangle(position:Vector2, size:float):
+func remove_building_rectangle(position:Vector2, size:float) -> void:
 	print("Remove Building Rectangle")
-	size *= 0.5
-	var outline:PoolVector2Array = PoolVector2Array([Vector2.ZERO, Vector2.ZERO, Vector2.ZERO, Vector2.ZERO])
-	outline[0] = Vector2(position.x - size, position.y - size)
-	outline[0] = Vector2(position.x + size, position.y - size)
-	outline[0] = Vector2(position.x + size, position.y + size)
-	outline[0] = Vector2(position.x - size, position.y + size)
-	navigation_polygon.add_outline(outline)
-	navigation_polygon_instance.navpoly = navigation_polygon
+
+#	var hole_outline:PoolVector2Array = PoolVector2Array([Vector2.ZERO, Vector2.ZERO, Vector2.ZERO, Vector2.ZERO])
+#	var hole_transform:Transform2D = navigation_polygon_instance.transform.inverse()
+#	size *= 0.5
+#	hole_outline[0] = hole_transform.xform(Vector2(position.x - size, position.y - size))
+#	hole_outline[0] = hole_transform.xform(Vector2(position.x + size, position.y - size))
+#	hole_outline[0] = hole_transform.xform(Vector2(position.x + size, position.y + size))
+#	hole_outline[0] = hole_transform.xform(Vector2(position.x - size, position.y + size))
+#	navigation_polygon_instance.navpoly.add_outline(hole_outline)
+#	navigation_polygon_instance.navpoly.make_polygons_from_outlines()
+#
+#	navigation_polygon_instance.enabled = false
+#	navigation_polygon_instance.enabled = true
+
+#	navigation_2d.navpoly_remove(navpoly_id)
+#	navpoly_id = navigation_2d.navpoly_add(navigation_polygon, Transform2D.IDENTITY)
 
 # Adds the resource of the specified type with a consistent name across peers
 func rpc_add_resource(type:int, x:float, z:float) -> void:
@@ -78,7 +85,7 @@ func rpc_add_resource(type:int, x:float, z:float) -> void:
 	rpc("add_resource", type, position, new_resource_name)
 
 # Return would be typed but cyclic dependency error
-remote func add_resource(type:int, position:Vector3, name:String = ""): 
+remote func add_resource(type:int, position:Vector3, name:String = ""):
 	var resource_scene = preload("res://Resources/Resource.tscn")
 	var resource_node = resource_scene.instance()
 	resource_node.load_resource(type)
@@ -96,6 +103,7 @@ func randomly_place_resources():
 	var theta = 360 / affiliation_count
 	var right_ray = 360 / affiliation_count
 	var left_ray = 0
+	# warning-ignore:unused_variable
 	for i in range(affiliation_count):
 		# warning-ignore:unused_variable
 		for type in range(3):

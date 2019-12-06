@@ -37,13 +37,13 @@ func rpc_set_color_from_hue(hue:float) -> void:
 	rpc("set_color_from_hue", hue)
 
 remote func set_color_from_hue(hue:float) -> void:
-	var color:Color = Color.from_hsv(hue, 0.75, 1)
-	set_color(color)
+	var color_from_hue:Color = Color.from_hsv(hue, 0.75, 1)
+	set_color(color_from_hue)
 
-remote func set_color(color:Color) -> void:
-	emit_signal("color_updated", color)
-	self.color = color
-	color_material.albedo_color = color
+remote func set_color(new_color:Color) -> void:
+	emit_signal("color_updated", new_color)
+	self.color = new_color
+	color_material.albedo_color = new_color
 
 remote func set_id(id:String) -> void:
 	self.id = id

@@ -9,6 +9,7 @@ var debug_im_material:SpatialMaterial = null
 var debug_print_navigation_path:bool = false
 
 # Unit Type
+# warning-ignore:unused_class_variable
 var type:int = 0
 
 # Movement Information (Set by unit types)
@@ -23,6 +24,7 @@ enum {ORDER_NAVIGATION_POSITION, ORDER_NAVIGATION_NODE, ORDER_ATTACK,}
 # Current Navigation Information
 var navigation:Navigation2D = null
 var navigation_terrain_3d:Navigation = null
+# warning-ignore:unused_class_variable
 var target_node # Target Node (Should be typed but https://github.com/godotengine/godot/issues/21461)
 var navigation_recalculation_timer:Timer = null
 var path:PoolVector2Array = PoolVector2Array()
@@ -31,11 +33,14 @@ const NAVIGATION_RECALCULATION_FREQUENCY:float = 4.0 # Seconds
 const NAVIGATION_POINT_REACHED_DISTANCE:float = 0.1 # Distance to the current point along the path before switching to the next
 
 # Action State and Effect
+# warning-ignore:unused_class_variable
 var action_countdown:float
+# warning-ignore:unused_class_variable
 var active_action:int
 var action_range:float = 2.5 # Range of actions (Meters)
 
 # Damage constant
+# warning-ignore:unused_class_variable
 var damage:int = 5
 
 # Damage timer
@@ -61,6 +66,7 @@ func _ready():
 
 	attack_timer = Timer.new()
 	add_child(attack_timer)
+# warning-ignore:return_value_discarded
 	attack_timer.connect("timeout", self, "attack_finish")
 
 func _physics_process(delta: float) -> void:
@@ -226,7 +232,8 @@ remote func clear_orders() -> void:
 func attack_finish():
 	pass
 
-func action_complete(type:int):
+# warning-ignore:unused_argument
+func action_complete(action_type:int):
 	pass
 
 func set_movement_information():

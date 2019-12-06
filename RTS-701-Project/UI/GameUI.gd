@@ -23,12 +23,16 @@ func _ready():
 	affiliation = player.get_parent()
 
 	# Connect action signals
+	# warning-ignore:return_value_discarded
 	$ActionsWorker/PlaceBase.connect("button_down", self,
 	                                 "place_building_pressed", [Affiliation.BUILDING_TYPE_BASE])
+	# warning-ignore:return_value_discarded
 	$ActionsWorker/PlaceArmy.connect("button_down", self,
 	                                 "place_building_pressed", [Affiliation.BUILDING_TYPE_ARMY])
+	# warning-ignore:return_value_discarded
 	$ActionsBase/CreateWorker.connect("button_down", self,
 	                                  "production_start_pressed", [Affiliation.UNIT_TYPE_WORKER])
+	# warning-ignore:return_value_discarded
 	$ActionsArmy/CreateArmy.connect("button_down", self,
 	                                  "production_start_pressed", [Affiliation.UNIT_TYPE_ARMY])
 	assert(affiliation.connect("resource_0_change", self, "set_resource_text") == OK)
@@ -37,8 +41,7 @@ func _ready():
 	set_resource_text()
 
 func set_resource_text():
-	var affiliation:Affiliation = get_parent().get_parent()
-	for i in range(affiliation.resources.size()):
+	for i in range(self.affiliation.resources.size()):
 
 		var label:Label = get_node("Information/Resource" + str(i) + "/Value")
 		label.text = str(affiliation.resources[i])
