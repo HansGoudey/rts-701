@@ -312,7 +312,7 @@ func connection_failed():
 	pass
 
 func server_disconnected():
-	pass
+	get_tree().quit()
 
 func cmd_args_exist() -> bool:
 	# command line args will only exist if

@@ -13,7 +13,7 @@ var navigation_polygon_instance:NavigationPolygonInstance = null
 # Resource Generation
 const MAX_MAP_HEIGHT:float = 1000.0 # For intersections with terrain
 enum {RESOURCE0 = 0, RESOURCE1 = 1, RESOURCE2 = 2}
-var num_of_resources:int = 10
+var num_of_resources:int = 1
 var rng:RandomNumberGenerator = null
 
 func _ready():
