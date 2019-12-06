@@ -306,8 +306,9 @@ func _input(event:InputEvent):
 			set_ui_panel()
 		elif event.button_index == BUTTON_RIGHT:
 			# Right click adds a navigation order to the selected units
-			if selected_entities.size() > 0:
-				add_navigation_orders()
+			if event.pressed:
+				if selected_entities.size() > 0:
+					add_navigation_orders()
 
 func rpc_set_id(new_id:String) -> void:
 	set_id(new_id)

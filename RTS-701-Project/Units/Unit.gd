@@ -72,8 +72,10 @@ func _physics_process(delta: float) -> void:
 	process_current_order(delta)
 
 func process_current_order(delta:float) -> void:
+	var order_type:int = get_order_type()
+
 	# Default behaviour without player added orders
-	if orders.size() == 0:
+	if orders.size() == 0 or order_type == -1:
 		if get_tree().is_network_server():
 			var targets = get_targets()
 			if targets.size() == 0:
@@ -92,7 +94,7 @@ func process_current_order(delta:float) -> void:
 				return
 			rpc_add_attack_order(nearest_target.get_path())
 	# Process orders added by the player or previously by the default behaviour
-	var order_type:int = get_order_type()
+
 	if order_type == ORDER_NAVIGATION_POSITION or order_type == ORDER_NAVIGATION_NODE:
 		# If navigation is complete, pop the order from the queue, otherwise process it
 		if navigation_complete():
@@ -101,9 +103,6 @@ func process_current_order(delta:float) -> void:
 	elif order_type == ORDER_ATTACK:
 		# If target node is destroyed / gone, pop this order from the queue
 		attack_start()
-	else:
-		# Undefined order type
-		print("Undefined order type")
 
 func attack_start() -> void:
 	if attack_timer.is_stopped():
