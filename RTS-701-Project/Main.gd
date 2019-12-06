@@ -41,7 +41,7 @@ func _ready():
 func check_game_start_lobby() -> void:
 	if not get_tree().is_network_server():
 		return
-	
+
 	var all_players_ready:bool = true
 	for player_node in player_info.values():
 

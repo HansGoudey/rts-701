@@ -8,7 +8,7 @@ var affiliation:Affiliation
 # Health
 var health:int = 0
 var maximum_health:int = 100
-var health_bar:CubeMesh = null
+var health_bar:HealthBar = null
 
 # Damage
 enum DamageTypes {DMG_SPASH = 0, DMG_DIRECT = 1, DMG_MELEE = 2}
@@ -51,12 +51,13 @@ func _ready():
 	add_child(select_circle, true)
 
 	set_affiliation_material()
-	
+
 	# Add health bar above the entity
-#	var health_bar_mesh = CubeMesh.new()
-#	health_bar = health_bar_mesh.instance()
-#	add_child(health_bar_mesh)
-#	CubeMesh.translation = self.translation + (Vector3.UP * entity_size * 2)
+	var health_bar_scene = load("res://UI/Health Bar/HealthBar.tscn")
+	health_bar = health_bar_scene.instance()
+	health_bar.translation = Vector3.UP * (entity_size * 2)
+	health_bar.set_material(affiliation.color_material)
+	add_child(health_bar)
 
 func check_cost_and_resources() -> bool:
 	for i in range(affiliation.resources.size()):
@@ -66,6 +67,8 @@ func check_cost_and_resources() -> bool:
 
 func change_health(health:int, type:int) -> void:
 	self.health -= health * damage_type_multipliers[type]
+
+	health_bar.set_bar(self.health / self.maximum_health)
 
 	if self.health < 0:
 		die()

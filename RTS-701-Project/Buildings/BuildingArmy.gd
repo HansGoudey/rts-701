@@ -4,8 +4,8 @@ func _ready():
 	self.type = Affiliation.BUILDING_TYPE_ARMY
 	self.damage_type_multipliers = [1, 1, 1]
 
-func _process(delta):
-	pass
+#func _process(delta):
+#	pass
 
 
 # =================================================================================================

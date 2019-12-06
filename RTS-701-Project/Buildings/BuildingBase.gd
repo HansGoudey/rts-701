@@ -4,8 +4,8 @@ func _ready():
 	self.type = Affiliation.BUILDING_TYPE_BASE
 	self.damage_type_multipliers = [1, 1, 1]
 
-func _process(delta):
-	pass
+#func _process(delta):
+#	pass
 
 
 # =================================================================================================
@@ -33,7 +33,6 @@ func set_affiliation_material() -> void:
 # =================================================================================================
 
 func production_finish() -> void:
-	print("Production Finished")
 	var new_unit = affiliation.rpc_add_unit(production_selection, self.translation)
 	new_unit.rpc_add_navigation_order_position(self.translation + Vector3(0, 0, 2))
 	self.production_timer.stop()

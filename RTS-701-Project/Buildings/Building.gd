@@ -3,6 +3,7 @@ extends Entity
 class_name Building
 
 # Building Type
+# warning-ignore:unused_class_variable
 var type:int = 0
 
 
@@ -14,11 +15,12 @@ func _ready():
 	# TODO: Create a new timer every time start production is called
 	production_timer = Timer.new()
 	add_child(production_timer)
+# warning-ignore:return_value_discarded
 	production_timer.connect("timeout", self, "production_finish")
 	add_to_group("targets")
 
-func _process(delta):
-	pass
+#func _process(delta):
+#	pass
 
 func rpc_start_production(production_type:int):
 	start_production(production_type)

@@ -4,8 +4,8 @@ func _ready():
 	type = Affiliation.UNIT_TYPE_ARMY
 	damage_type_multipliers = [1, 1, 1]
 
-func _process(delta):
-	pass
+#func _process(delta):
+#	pass
 
 
 # =================================================================================================
@@ -29,7 +29,7 @@ func attack():
 	if not target_node:
 		pop_order()
 	else:
-		var wr
+		var wr:WeakRef
 		if target_node:
 			wr = weakref(target_node);
 		if not wr.get_ref():
@@ -48,8 +48,8 @@ func set_affiliation_material() -> void:
 # ============================== Functions overriden from Unit Class ==============================
 # =================================================================================================
 
-func action_complete(type:int):
-	pass
+#func action_complete(type:int):
+#	pass
 
 func set_movement_information():
 	self.acceleration = 2.0

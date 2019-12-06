@@ -4,8 +4,8 @@ func _ready():
 	type = Affiliation.UNIT_TYPE_WORKER
 	damage_type_multipliers = [1, 1, 1]
 
-func _process(delta):
-	pass
+#func _process(delta):
+#	pass
 
 
 # =================================================================================================
@@ -32,8 +32,8 @@ func set_affiliation_material() -> void:
 # ============================== Functions overriden from Unit Class ==============================
 # =================================================================================================
 
-func action_complete(type:int):
-	pass
+#func action_complete(type:int):
+#	pass
 
 func set_movement_information():
 	self.acceleration = 1.0
