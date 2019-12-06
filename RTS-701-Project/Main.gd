@@ -201,7 +201,6 @@ remote func server_unlock_peer_multiplayer():
 	# TODO: Use a more complex lock, indluding tracking which player is locked, handle timing out etc...
 	multiplayer_lock += 1
 	if multiplayer_lock == player_info.size():
-		print("Emit Multiplayer Lock Complete Signal")
 		emit_signal("multiplayer_lock_complete")
 		multiplayer_lock = 0
 		# TODO: Disconnect all connections to signal

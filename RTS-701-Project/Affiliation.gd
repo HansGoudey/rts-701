@@ -29,7 +29,6 @@ enum {BUILDING_TYPE_ARMY = 0, BUILDING_TYPE_BASE = 1}
 enum {UNIT_TYPE_ARMY = 0, UNIT_TYPE_WORKER = 1}
 
 func _ready() -> void:
-	print("Affiliation Ready")
 	resources = [100, 100, 100]
 	color_material = SpatialMaterial.new()
 	color_material.albedo_color = color

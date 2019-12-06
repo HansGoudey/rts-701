@@ -69,30 +69,28 @@ func _ready():
 	assert(attack_timer.connect("timeout", self, "attack_finish") == OK)
 
 func _physics_process(delta: float) -> void:
-	if get_tree().is_network_server():
-		process_current_order(delta)
+	process_current_order(delta)
 
 func process_current_order(delta:float) -> void:
 	# Default behaviour without player added orders
 	if orders.size() == 0:
+		if get_tree().is_network_server():
+			var targets = get_targets()
+			if targets.size() == 0:
+				return
 
-		var targets = get_targets()
-		if targets.size() == 0:
-			return
+			# Find the closest target
+			var nearest_target = targets[0]
+			for target in targets:
+				if target is Affiliation: # TODO: Huh?
+					pass
+				elif self.translation.distance_to(target.translation) < self.translation.distance_to(nearest_target.translation):
+					nearest_target = target
 
-		# Find the closest target
-		var nearest_target = targets[0]
-		for target in targets:
-			if target is Affiliation:
-				print("Target is affiliation")
-			elif self.translation.distance_to(target.translation) < self.translation.distance_to(nearest_target.translation):
-				nearest_target = target
-
-		# Add an order for that target if it's within the range
-		if self.translation.distance_to(nearest_target.translation) > action_range:
-			return
-		rpc_add_attack_order(nearest_target.get_path())
-
+			# Add an order for that target if it's within the range
+			if self.translation.distance_to(nearest_target.translation) > action_range:
+				return
+			rpc_add_attack_order(nearest_target.get_path())
 	# Process orders added by the player or previously by the default behaviour
 	var order_type:int = get_order_type()
 	if order_type == ORDER_NAVIGATION_POSITION or order_type == ORDER_NAVIGATION_NODE:

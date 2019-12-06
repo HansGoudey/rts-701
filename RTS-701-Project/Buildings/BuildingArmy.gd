@@ -33,6 +33,7 @@ func set_affiliation_material() -> void:
 # =================================================================================================
 
 func production_finish() -> void:
+	print("Production Finish")
 	var new_unit:Unit = affiliation.rpc_add_unit(Affiliation.UNIT_TYPE_ARMY, self.translation)
 	new_unit.rpc_add_navigation_order_position(self.translation + Vector3(0, 0, 2))
 	self.production_timer.stop()

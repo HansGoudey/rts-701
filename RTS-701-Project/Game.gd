@@ -9,5 +9,4 @@ func start_game():
 	pass
 
 func place_start_map_items():
-	print("Place Start Map Items")
 	$Map.place_map_items()
