@@ -218,7 +218,7 @@ remote func add_navigation_order_node(node_path:String) -> void:
 
 func rpc_clear_orders() -> void:
 	clear_orders()
-	rpc("clear_order_queue")
+	rpc("clear_orders")
 
 remote func clear_orders() -> void:
 	orders.clear()
