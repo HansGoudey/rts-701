@@ -1,7 +1,7 @@
 extends Control
 
 var main:Main = null
-var map_selector:ItemList
+var map_selector:ItemList = null
 var last_ui_build = [] # For clearing the last set of panels built
 
 func _ready() -> void:
@@ -21,11 +21,11 @@ func _ready() -> void:
 	$PlayerItem.visible = false
 
 	# Set up the map selector's items, signals, and default
-	var map_selector = $MapSelector/ItemList
+	map_selector = $MapSelector/ItemList
 	map_selector.add_item("Terrain")
 	map_selector.add_item("SimpleTerrain")
 	map_selector.select(1)
-	map_selector.connect("item_selected", self, "rpc_push_map_selection")
+	assert(map_selector.connect("item_selected", self, "rpc_push_map_selection") == OK)
 
 	build_ui()
 
