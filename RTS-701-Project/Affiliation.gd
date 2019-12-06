@@ -45,8 +45,8 @@ remote func set_color(new_color:Color) -> void:
 	self.color = new_color
 	color_material.albedo_color = new_color
 
-remote func set_id(id:String) -> void:
-	self.id = id
+remote func set_id(new_id:String) -> void:
+	self.id = new_id
 
 func rpc_change_resource(which:int, amount:float) -> void:
 	change_resource(which, amount)

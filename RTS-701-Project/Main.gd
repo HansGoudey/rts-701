@@ -14,7 +14,8 @@ var player_info = {} # {id: Player node}
 var player_name_from_title:String = ""
 var affiliations = [] # Only used during lobby phase, Game stores them after that
 var connected_success:bool = false
-var basin_instance:bool = false
+var dedicated_server:bool = false
+var game_started:bool = false
 signal lobby_ui_update
 
 func _ready():
@@ -32,10 +33,9 @@ func _ready():
 	assert(get_tree().connect("connection_failed", self, "connection_failed") == OK)
 	assert(get_tree().connect("server_disconnected", self, "server_disconnected") == OK)
 
-	basin_instance = cmd_args_exist()
-	if basin_instance: # if run on basin set host game
+	dedicated_server = cmd_args_exist()
+	if dedicated_server: # if run on basin set host game
 		host_game()
-
 
 # In the lobby, start the game if all players are ready
 func check_game_start_lobby() -> void:
@@ -50,7 +50,7 @@ func check_game_start_lobby() -> void:
 			break
 
 	# on basin, there should be at least be one other player in the lobby
-	if basin_instance and player_info.size() < 2:
+	if dedicated_server and player_info.size() < 2:
 		all_players_ready = false
 	if all_players_ready:
 		start_game()
@@ -96,9 +96,7 @@ func rpc_add_player(peer_id:int, affiliation:Affiliation, id:String) -> Player:
 # Instance a player scene, map the network peer ID to it, and return it
 # Doesn't contain a 'name' argument because the unique peer ID is appended to the name, so it's consistent
 # If 'use_start_ui_id' is set it will set the id from the variable gathered from the start screen earlier
-remote func add_player(peer_id:int, affiliation_path:String, id:String, use_start_ui_id:bool) -> Player:
-	# Get references to nodes from paths
-	var affiliation:Affiliation = get_node(affiliation_path)
+remote func add_player(peer_id:int, affiliation_path:String, new_id:String, use_start_ui_id:bool) -> Player:
 #	print("Add Player with ID ", id, " for ", peer_id, " to affiliation ID ", affiliation.id)
 
 	# Instance the player and set its information
@@ -106,10 +104,10 @@ remote func add_player(peer_id:int, affiliation_path:String, id:String, use_star
 	var player_node:Player = player_scene.instance()
 	player_node.set_name("Player" + str(peer_id))
 	player_node.set_network_master(peer_id)
-	player_node.id = id
+	player_node.id = new_id
 
 	if not use_start_ui_id:
-		player_node.id = id
+		player_node.id = new_id
 
 	add_child(player_node) # Player needs to be part of the tree to have a path
 	assign_player_to_affiliation(player_node.get_path(), affiliation_path)
@@ -208,6 +206,7 @@ remote func start_game():
 	get_player(get_tree().get_network_unique_id()).load_ui()
 
 	game_node.start_game()
+	game_started = true
 
 # Start the lobby scene to set up the game, freeing the start UI
 func start_lobby():
@@ -238,7 +237,7 @@ func host_game() -> void:
 	var player:Player = add_player(1, affiliation.get_path(), "", true)
 
 	# basin should automatically be ready when the server starts
-	if basin_instance:
+	if dedicated_server:
 		player.set_lobby_ready(true)
 
 	player_info[1] = player
@@ -268,6 +267,12 @@ func join_game() -> void:
 		join_game()
 	elif error == ERR_CANT_CREATE:
 		print("Can't create connection")
+
+func rpc_update_lobby_ui():
+	rpc("update_lobby_ui")
+
+remote func update_lobby_ui():
+	emit_signal("lobby_ui_update")
 
 func network_peer_connected(new_peer_id):
 	if not get_tree().is_network_server():

@@ -8,6 +8,8 @@ A player corresponds to a human interacting with an affiliation. It will always
 be the child of an 'Affiliation' node.
 """
 
+var main = null # Can't type this...
+
 # Name for UI (not the name of the node)
 var id:String = ""
 
@@ -48,6 +50,7 @@ var create_building_type:int = 0
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	camera = get_node("Camera")
+	main = get_node("/root/Main")
 
 	# Make this player's camera the active camera if it is the player for the local computer
 	if self.is_network_master():
@@ -278,6 +281,8 @@ func set_ui_panel():
 func _input(event:InputEvent):
 	if not self.is_network_master():
 		return
+	if not main.game_started:
+		return
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_LEFT:
 			if event.pressed: # Mouse just pressed or has been pressed
@@ -304,16 +309,18 @@ func _input(event:InputEvent):
 			if selected_entities.size() > 0:
 				add_navigation_orders()
 
-func rpc_set_id(id:String) -> void:
-	set_id(id)
-	rpc("set_id", id)
+func rpc_set_id(new_id:String) -> void:
+	set_id(new_id)
+	rpc("set_id", new_id)
+	main.rpc_update_lobby_ui()
 
-remote func set_id(id:String) -> void:
-	self.id = id
+remote func set_id(new_id:String) -> void:
+	self.id = new_id
 
 func rpc_set_lobby_ready(ready:bool) -> void:
 	set_lobby_ready(ready)
 	rpc("set_lobby_ready", ready)
+	main.rpc_update_lobby_ui()
 
 remote func set_lobby_ready(ready:bool) -> void:
 	self.ready_to_start = ready

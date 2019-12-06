@@ -8,7 +8,6 @@ var navigation_mesh:NavigationMesh = null
 # 2D Navigation Node (For unit pathfinding)
 var navigation_2d:Navigation2D = null
 var navpoly_id:int = 0
-var navigation_polygon:NavigationPolygon = null
 var navigation_polygon_instance:NavigationPolygonInstance = null
 
 # Resource Generation
@@ -59,6 +58,8 @@ func _ready():
 		randomly_place_resources()
 		place_start_buildings()
 
+# warning-ignore:unused_argument
+# warning-ignore:unused_argument
 func remove_building_rectangle(position:Vector2, size:float) -> void:
 	print("Remove Building Rectangle")
 

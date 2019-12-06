@@ -65,10 +65,10 @@ func check_cost_and_resources() -> bool:
 			return false
 	return true
 
-func change_health(health:int, type:int) -> void:
-	self.health -= health * damage_type_multipliers[type]
+func change_health(new_health:int, type:int) -> void:
+	self.health -= new_health * damage_type_multipliers[type]
 
-	health_bar.set_bar(self.health / self.maximum_health)
+	health_bar.set_bar(float(self.health) / float(self.maximum_health))
 
 	if self.health < 0:
 		die()
