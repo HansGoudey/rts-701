@@ -119,7 +119,11 @@ remote func add_unit(type:int, position:Vector3, name:String):
 
 	return unit_node
 
-func set_start_position(position:Vector2) -> void:
+func rpc_set_start_position(position:Vector2) -> void:
+	set_start_position(position)
+	rpc("set_start_position", position)
+
+remote func set_start_position(position:Vector2) -> void:
 	self.start_position = position
 
 	# Move all player's cameras to the start postion

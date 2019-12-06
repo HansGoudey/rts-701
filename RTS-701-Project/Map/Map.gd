@@ -131,6 +131,6 @@ func place_start_buildings():
 	for i in range(affiliations.size()):
 		var affiliation:Affiliation = affiliations[i]
 		var location:Vector2 = polar2cartesian(terrain_aabb.end.x * 0.75, i * (2 * PI) / affiliations.size())
-		affiliation.set_start_position(location)
+		affiliation.rpc_set_start_position(location)
 		var location_3d:Vector3 = Vector3(location.x, 0, location.y)
 		affiliation.rpc_add_building(Affiliation.BUILDING_TYPE_BASE, location_3d)

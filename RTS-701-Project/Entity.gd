@@ -33,7 +33,7 @@ func _ready():
 		return
 
 	for i in range(affiliation.resources.size()):
-		affiliation.rpc_change_resource(i, -cost[i])
+		affiliation.change_resource(i, -cost[i])
 
 	initialize_health()
 
