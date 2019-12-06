@@ -44,9 +44,7 @@ func set_action_range():
 
 func attack_finish():
 	var target_node = get_navigation_target_node()
-	if not target_node:
-		pass
-	else:
+	if target_node:
 		var wr
 		if target_node:
 			wr = weakref(target_node);

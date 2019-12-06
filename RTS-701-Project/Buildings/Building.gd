@@ -6,6 +6,7 @@ class_name Building
 # warning-ignore:unused_class_variable
 var type:int = 0
 
+# TODO: Building units takes twice as much resources as it should
 
 # Production State (Countdown or position in production process)
 var production_selection:int = 0 # TODO: Use separate enum for profuction type

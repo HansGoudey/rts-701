@@ -26,9 +26,7 @@ func die() -> void:
 
 func attack():
 	var target_node = get_navigation_target_node()
-	if not target_node:
-		pass
-	else:
+	if target_node:
 		var wr:WeakRef
 		if target_node:
 			wr = weakref(target_node);
