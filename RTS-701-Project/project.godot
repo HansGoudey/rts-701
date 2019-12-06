@@ -45,11 +45,6 @@ _global_script_classes=[ {
 "path": "res://Resources/Resource.gd"
 }, {
 "base": "Node",
-"class": "Order",
-"language": "GDScript",
-"path": "res://Orders/Order.gd"
-}, {
-"base": "Node",
 "class": "Player",
 "language": "GDScript",
 "path": "res://Player.gd"
@@ -72,7 +67,6 @@ _global_script_class_icons={
 "HealthBar": "",
 "Main": "",
 "MapResource": "",
-"Order": "",
 "Player": "",
 "Projectile": "",
 "Unit": ""

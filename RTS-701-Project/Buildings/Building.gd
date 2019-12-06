@@ -19,7 +19,6 @@ func _ready():
 	# warning-ignore:return_value_discarded
 	if get_tree().is_network_server():
 		production_timer.connect("timeout", self, "production_finish")
-	add_to_group("targets") # TODO: Better group names and more extensive use of groups
 
 #func _process(delta):
 #	pass

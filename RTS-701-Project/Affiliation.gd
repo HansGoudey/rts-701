@@ -18,6 +18,8 @@ signal resource_2_change
 # warning-ignore:unused_class_variable
 var players = []
 
+var start_position:Vector2 = Vector2.ZERO
+
 # Visible Area (Fog of war)
 
 # Building Types
@@ -116,3 +118,11 @@ remote func add_unit(type:int, position:Vector3, name:String):
 	add_child(unit_node, true)
 
 	return unit_node
+
+func set_start_position(position:Vector2) -> void:
+	self.start_position = position
+
+	# Move all player's cameras to the start postion
+	for player in players:
+		player.camera.translation.x = position.x
+		player.camera.translation.z = position.y + 10

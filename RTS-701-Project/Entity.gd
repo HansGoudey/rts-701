@@ -37,11 +37,20 @@ func _ready():
 
 	initialize_health()
 
-	# Add a circle the size of the mesh below it to show when the entity is selected
+	add_to_group("Entities", true)
+
 	# TODO: Change this to something that looks better. Maybe another material or a mesh
 	#       specific to each entity type
 	var mesh:MeshInstance = get_child(0)
 	var entity_size:Vector3 = mesh.get_transformed_aabb().size * 1.5
+
+	add_select_circle(entity_size)
+
+	set_affiliation_material()
+
+	add_health_bar(entity_size)
+
+func add_select_circle(entity_size:Vector3) -> void:
 	var circle_size:float = max(entity_size.x, entity_size.z)
 
 	var select_circle_scene = load("res://UI/SelectCircle.glb")
@@ -50,12 +59,10 @@ func _ready():
 	select_circle.set_visible(false)
 	add_child(select_circle, true)
 
-	set_affiliation_material()
-
-	# Add health bar above the entity
+func add_health_bar(entity_size) -> void:
 	var health_bar_scene = load("res://UI/Health Bar/HealthBar.tscn")
 	health_bar = health_bar_scene.instance()
-	health_bar.translation = Vector3.UP * (entity_size * 2)
+	health_bar.translation = Vector3.UP * (entity_size)
 	health_bar.set_material(affiliation.color_material)
 	add_child(health_bar)
 

@@ -41,7 +41,7 @@ var action_range:float = 2.5 # Range of actions (Meters)
 
 # Damage constant
 # warning-ignore:unused_class_variable
-var damage:int = 5
+var damage:int = 0
 
 # Damage timer
 var attack_timer:Timer = null
@@ -66,41 +66,39 @@ func _ready():
 
 	attack_timer = Timer.new()
 	add_child(attack_timer)
-# warning-ignore:return_value_discarded
-	attack_timer.connect("timeout", self, "attack_finish")
+	assert(attack_timer.connect("timeout", self, "attack_finish") == OK)
 
 func _physics_process(delta: float) -> void:
-	process_current_order(delta)
-
-func attack_start() -> void:
-	if attack_timer.is_stopped():
-		attack_timer.start(1.0)
+	if get_tree().is_network_server():
+		process_current_order(delta)
 
 func process_current_order(delta:float) -> void:
+	# Default behaviour without player added orders
 	if orders.size() == 0:
-		# Default behaviour without player added orders
-		var targets = get_tree().get_nodes_in_group("targets")
-		# Choose the closest target
-		if targets.size() != 0:
-			var nearest_target = targets[0]
-			for target in targets:
-				if self.translation.distance_to(target.translation) < self.translation.distance_to(nearest_target.translation):
-					nearest_target = target
-			# Add an order for that target if it is close enough:
-			if self.translation.distance_to(nearest_target.translation) < action_range:
-				orders.push_back([ORDER_ATTACK, nearest_target])
-			else:
-				return
-		else:
+
+		var targets = get_targets()
+		if targets.size() == 0:
 			return
 
+		# Find the closest target
+		var nearest_target = targets[0]
+		for target in targets:
+			if target is Affiliation:
+				print("Target is affiliation")
+			elif self.translation.distance_to(target.translation) < self.translation.distance_to(nearest_target.translation):
+				nearest_target = target
+
+		# Add an order for that target if it's within the range
+		if self.translation.distance_to(nearest_target.translation) > action_range:
+			return
+		rpc_add_attack_order(nearest_target.get_path())
+
+	# Process orders added by the player or previously by the default behaviour
 	var order_type:int = get_order_type()
 	if order_type == ORDER_NAVIGATION_POSITION or order_type == ORDER_NAVIGATION_NODE:
-		# If navigation is complete, pop it from the queue
+		# If navigation is complete, pop the order from the queue, otherwise process it
 		if navigation_complete():
 			pop_order()
-
-		# Process current navigation goal (recalculate at a frequency)
 		process_navigation(delta)
 	elif order_type == ORDER_ATTACK:
 		# If target node is destroyed / gone, pop this order from the queue
@@ -108,6 +106,10 @@ func process_current_order(delta:float) -> void:
 	else:
 		# Undefined order type
 		print("Undefined order type")
+
+func attack_start() -> void:
+	if attack_timer.is_stopped():
+		attack_timer.start(1.0)
 
 func navigation_complete() -> bool:
 	return self.translation.distance_to(get_navigation_target_position()) < NAVIGATION_POINT_REACHED_DISTANCE
@@ -149,7 +151,8 @@ func process_navigation(delta:float) -> void:
 		navigation_recalculation_timer.start(NAVIGATION_RECALCULATION_FREQUENCY)
 
 	# If we reached the next navigation point, start moving to the one after
-	# TODO: Use a more sophisticated metric for determining whether a point is reached
+	# TODO: Use a more sophisticated metric for determining whether a point is reached, like when it's closer
+	#       to the next point on the path than to the previous one
 	if self.get_2d_translation().distance_to(path[0]) < NAVIGATION_POINT_REACHED_DISTANCE:
 		path.remove(0)
 		if path.size() == 0:
@@ -182,11 +185,14 @@ func get_navigation_target_position():
 		var node = orders[0][1] as Spatial
 		return node.translation
 
-func get_navigation_target_node():
+func get_target_node():
 	var order_type:int = get_order_type()
 	if order_type == ORDER_NAVIGATION_NODE or order_type == ORDER_ATTACK:
-		var node = orders[0][1]
-		return node
+		if get_tree().get_root().has_node(orders[0][1]):
+			var node = get_node(orders[0][1])
+			return node
+		else:
+			return null
 	else:
 		return null
 
@@ -213,8 +219,19 @@ func rpc_add_navigation_order_position(position:Vector3) -> void:
 remote func add_navigation_order_position(position:Vector3) -> void:
 	orders.push_back([ORDER_NAVIGATION_POSITION, position])
 
+func rpc_add_navigation_order_node(node_path:String) -> void:
+	add_navigation_order_node(node_path)
+	rpc("add_navigation_order_position", node_path)
+
 remote func add_navigation_order_node(node_path:String) -> void:
 	orders.push_back([ORDER_NAVIGATION_NODE, node_path])
+
+func rpc_add_attack_order(node_path:String) -> void:
+	add_attack_order(node_path)
+	rpc("add_attack_order", node_path)
+
+remote func add_attack_order(node_path:String) -> void:
+	orders.push_back([ORDER_ATTACK, node_path])
 
 func rpc_clear_orders() -> void:
 	clear_orders()
@@ -230,6 +247,9 @@ remote func clear_orders() -> void:
 # =================================================================================================
 
 func attack_finish():
+	pass
+
+func get_targets():
 	pass
 
 # warning-ignore:unused_argument

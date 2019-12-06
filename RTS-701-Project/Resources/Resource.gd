@@ -8,7 +8,7 @@ var resource_type:int
 enum {RESOURCE0 = 0, RESOURCE1 = 1, RESOURCE2 = 2}
 
 func _ready():
-	add_to_group("targets")
+	add_to_group("Resources", true)
 
 func load_resource(type:int) -> void:
 	var resource_scene
@@ -32,4 +32,5 @@ func harvest(damage:int) -> int:
 		return health
 
 func die() -> void:
+	remove_from_group("Resources")
 	self.queue_free()
