@@ -208,7 +208,7 @@ func pop_order() -> void:
 
 func rpc_add_navigation_order_position(position:Vector3) -> void:
 	add_navigation_order_position(position)
-	rpc("add_navigation_order", position)
+	rpc("add_navigation_order_position", position)
 
 remote func add_navigation_order_position(position:Vector3) -> void:
 	orders.push_back([ORDER_NAVIGATION_POSITION, position])

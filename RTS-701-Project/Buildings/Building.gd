@@ -26,7 +26,7 @@ func rpc_start_production(production_type:int):
 	start_production(production_type)
 	rpc("start_production", production_type)
 
-func start_production(production_type:int):
+remote func start_production(production_type:int):
 	production_selection = production_type
 	production_timer.start(2.0)
 
