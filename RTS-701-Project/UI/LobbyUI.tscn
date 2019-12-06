@@ -87,3 +87,17 @@ margin_top = 75.066
 margin_right = 464.6
 margin_bottom = 112.066
 text = "New Affiliation"
+
+[node name="MapSelector" type="Panel" parent="."]
+anchor_left = 0.8
+anchor_right = 0.8
+margin_left = -934.8
+margin_top = 95.0
+margin_right = -526.8
+margin_bottom = 317.0
+
+[node name="ItemList" type="ItemList" parent="MapSelector"]
+margin_left = 100.0
+margin_top = 38.0
+margin_right = 272.0
+margin_bottom = 149.0

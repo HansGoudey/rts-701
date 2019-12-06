@@ -6,6 +6,7 @@ var main:Main = null
 var navigation:Navigation = null
 var navmesh_id:int = 0
 var navigation_mesh:NavigationMesh = null
+var terrain_aabb:AABB
 
 # 2D Navigation Node (For unit pathfinding)
 var navigation_2d:Navigation2D = null
@@ -14,15 +15,18 @@ var navigation_polygon_instance:NavigationPolygonInstance = null
 
 # Resource Generation
 const MAX_MAP_HEIGHT:float = 1000.0 # For intersections with terrain
+const num_of_resources:int = 10
 enum {RESOURCE0 = 0, RESOURCE1 = 1, RESOURCE2 = 2}
-var num_of_resources:int = 1
 var rng:RandomNumberGenerator = null
 
 func _ready():
+	# TODO: Split into separate functions
 	main = get_node("/root/Main")
+	var lobby_map_itemlist:ItemList = get_node("/root/Main/LobbyUI/MapSelector/ItemList")
+	var map_choice:String = lobby_map_itemlist.get_item_text(lobby_map_itemlist.get_selected_items()[0])
 
 	# Add the terrain
-	var terrain_file = preload("res://Map/SimpleTerrain.glb")
+	var terrain_file = load("res://Map/" + map_choice + ".glb") # TODO: Make map mesh selector
 	var terrain_node = terrain_file.instance()
 	add_child(terrain_node)
 	var terrain_mesh_instance:MeshInstance = terrain_node.get_child(0)
@@ -42,7 +46,7 @@ func _ready():
 	navigation_2d = $Navigation2D
 	navigation_polygon_instance = NavigationPolygonInstance.new()
 	navigation_polygon_instance.navpoly = NavigationPolygon.new()
-	var terrain_aabb:AABB = terrain_mesh_instance.get_transformed_aabb()
+	terrain_aabb = terrain_mesh_instance.get_transformed_aabb()
 	var outline:PoolVector2Array = PoolVector2Array()
 	# Add the four corners of the terrain to the polygon
 	outline.push_back(Vector2(terrain_aabb.position.x, terrain_aabb.position.z))
@@ -56,18 +60,19 @@ func _ready():
 	navigation_polygon_instance.enabled = true
 	navigation_2d.add_child(navigation_polygon_instance)
 
-# Place resources after all other peers have the map node as well
+# Place resources after all other peers have the map node as well, so don't include in _ready
 func place_map_items() -> void:
 	if not get_tree().is_network_server():
 		return # The server finds the locations and places them on the other peers
-	rng = RandomNumberGenerator.new()
+	rng = RandomNumberGenerator.new() # TODO: Place based on size of terrain mesh
 	randomly_place_resources()
 	place_start_buildings()
 
 # warning-ignore:unused_argument
 # warning-ignore:unused_argument
 func remove_building_rectangle(position:Vector2, size:float) -> void:
-	print("Remove Building Rectangle")
+	pass
+	# TODO: Use polygon intersection in Godot 3.2
 
 #	var hole_outline:PoolVector2Array = PoolVector2Array([Vector2.ZERO, Vector2.ZERO, Vector2.ZERO, Vector2.ZERO])
 #	var hole_transform:Transform2D = navigation_polygon_instance.transform.inverse()
@@ -104,29 +109,27 @@ remote func add_resource(type:int, position:Vector3, name:String = ""):
 	return resource_node
 
 func randomly_place_resources():
-	var main_node = get_node("/root/Main")
-	var affiliations = main_node.affiliations
+	var affiliations = main.affiliations
 	var affiliation_count = affiliations.size()
-	var theta = 360 / affiliation_count
-	var right_ray = 360 / affiliation_count
-	var left_ray = 0
+	var theta:float = 2 * PI / affiliation_count
+	var right_ray:float = 2 * PI / affiliation_count
+	var left_ray:float = 0
 	# warning-ignore:unused_variable
 	for i in range(affiliation_count):
 		# warning-ignore:unused_variable
 		for type in range(3):
 			for k in range(num_of_resources):
-				var r = rng.randi_range(0, 50)
-				var th = rng.randi_range(left_ray, right_ray)
-				var coords = polar2cartesian(r, th)
+				var coords:Vector2 = polar2cartesian(rng.randf_range(0, terrain_aabb.end.x),
+											         rng.randf_range(left_ray, right_ray))
 				left_ray += theta
 				right_ray += theta
 				rpc_add_resource(type, coords[0], coords[1])
 
 func place_start_buildings():
-	var affiliations = get_node("/root/Main").affiliations
+	var affiliations = main.affiliations
 
 	for i in range(affiliations.size()):
 		var affiliation:Affiliation = affiliations[i]
-		var location:Vector2 = polar2cartesian(30, i * (2 * PI) / affiliations.size())
+		var location:Vector2 = polar2cartesian(terrain_aabb.end.x * 0.75, i * (2 * PI) / affiliations.size())
 		var location_3d:Vector3 = Vector3(location.x, 0, location.y)
 		affiliation.rpc_add_building(Affiliation.BUILDING_TYPE_BASE, location_3d)

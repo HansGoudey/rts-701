@@ -197,7 +197,6 @@ remote func remove_player(peer_id:int) -> void:
 	emit_signal("lobby_ui_update")
 
 remote func server_unlock_peer_multiplayer():
-	print("Server Unlock Peer Multiplayer")
 	assert(get_tree().is_network_server())
 	# TODO: Use a more complex lock, indluding tracking which player is locked, handle timing out etc...
 	multiplayer_lock += 1
@@ -209,7 +208,6 @@ remote func server_unlock_peer_multiplayer():
 #		self.disconnect("multiplayer_lock_complete", ..., ...)
 
 func multiplayer_unlock():
-	print("Multiplayer Unlock")
 	if get_tree().is_network_server():
 		server_unlock_peer_multiplayer()
 	else:

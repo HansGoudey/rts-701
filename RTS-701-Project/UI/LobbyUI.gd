@@ -1,9 +1,10 @@
 extends Control
 
 var main:Main = null
+var map_selector:ItemList
 var last_ui_build = [] # For clearing the last set of panels built
 
-func _ready():
+func _ready() -> void:
 	# Connect signals from updating affiliations and players to UI update function
 	main = find_parent("Main")
 	assert(main.connect("lobby_ui_update", self, "build_ui") == OK)
@@ -19,7 +20,20 @@ func _ready():
 	$AffiliationItem.visible = false
 	$PlayerItem.visible = false
 
+	# Set up the map selector's items, signals, and default
+	var map_selector = $MapSelector/ItemList
+	map_selector.add_item("Terrain")
+	map_selector.add_item("SimpleTerrain")
+	map_selector.select(1)
+	map_selector.connect("item_selected", self, "rpc_push_map_selection")
+
 	build_ui()
+
+func rpc_push_map_selection() -> void:
+	var selection:int = map_selector.get_selected_items()[0]
+
+remote func select_map(selection:int) -> void:
+	map_selector.select(selection)
 
 # Builds the entire lobby UI. Called whenever there is an update to affiliation / player structure
 # TODO: Lobby UI should really be built by keeping the ui elements for affiliations around with them rather

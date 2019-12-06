@@ -33,6 +33,6 @@ func set_affiliation_material() -> void:
 # =================================================================================================
 
 func production_finish() -> void:
-	var new_unit = affiliation.rpc_add_unit(production_selection, self.translation)
+	var new_unit:Unit = affiliation.rpc_add_unit(production_selection, self.translation)
 	new_unit.rpc_add_navigation_order_position(self.translation + Vector3(0, 0, 2))
 	self.production_timer.stop()

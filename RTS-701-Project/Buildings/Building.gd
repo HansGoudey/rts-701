@@ -15,9 +15,10 @@ func _ready():
 	# TODO: Create a new timer every time start production is called
 	production_timer = Timer.new()
 	add_child(production_timer)
-# warning-ignore:return_value_discarded
-	production_timer.connect("timeout", self, "production_finish")
-	add_to_group("targets")
+	# warning-ignore:return_value_discarded
+	if get_tree().is_network_server():
+		production_timer.connect("timeout", self, "production_finish")
+	add_to_group("targets") # TODO: Better group names and more extensive use of groups
 
 #func _process(delta):
 #	pass
