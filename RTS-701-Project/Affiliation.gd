@@ -105,6 +105,7 @@ func rpc_add_unit(type:int, position:Vector3): # TODO: Can't type Unit
 	return new_unit
 
 remote func add_unit(type:int, position:Vector3, name:String):
+	print("Add Unit")
 	var unit_scene
 	if type == UNIT_TYPE_ARMY:
 		unit_scene = load("res://Units/UnitArmy.tscn")

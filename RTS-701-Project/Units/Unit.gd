@@ -215,6 +215,7 @@ func rpc_add_navigation_order_position(position:Vector3) -> void:
 	rpc("add_navigation_order_position", position)
 
 remote func add_navigation_order_position(position:Vector3) -> void:
+	print("Add Navigation Order Position")
 	orders.push_back([ORDER_NAVIGATION_POSITION, position])
 
 func rpc_add_navigation_order_node(node_path:String) -> void:
