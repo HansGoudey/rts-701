@@ -270,27 +270,28 @@ func join_game() -> void:
 		print("Can't create connection")
 
 func network_peer_connected(new_peer_id):
-	if get_tree().is_network_server():
-		# Set up the current tree for a newly joined player
+	if not get_tree().is_network_server():
+		return
+	# Set up the current tree for a newly joined player
 #		print("  Giving new peer existing tree")
-		for child in get_children():
-			if child is Affiliation:
-				# Add each affiliation to the new peer
-				var affiliation = child as Affiliation
+	for child in get_children():
+		if child is Affiliation:
+			# Add each affiliation to the new peer
+			var affiliation = child as Affiliation
 #				print("    Adding affiliation (ID: " + affiliation.id + ")")
-				rpc_id(new_peer_id, "add_affiliation", affiliation.color, affiliation.id, affiliation.get_name())
+			rpc_id(new_peer_id, "add_affiliation", affiliation.color, affiliation.id, affiliation.get_name())
 
-				# Add that affiliation's players
-				for aff_child in affiliation.get_children():
-					if aff_child is Player:
-						var player = aff_child as Player
+			# Add that affiliation's players
+			for aff_child in affiliation.get_children():
+				if aff_child is Player:
+					var player = aff_child as Player
 #						print("    Adding player (ID:", player.id, ", Affiliation: ", player.affiliation.get_name(), ")")
-						rpc_id(new_peer_id, "add_player", player.get_network_master(), player.affiliation.get_path(), player.id, false)
+					rpc_id(new_peer_id, "add_player", player.get_network_master(), player.affiliation.get_path(), player.id, false)
 
-		# Add a new affiliation and player to the newly joined peer
-		var new_affiliation:Affiliation = rpc_add_affiliation(Color(randf(), randf(), randf()), "New Affiliation")
-		# warning-ignore:return_value_discarded
-		rpc_add_player(new_peer_id, new_affiliation, "TEMP ID")
+	# Add a new affiliation and player to the newly joined peer
+	var new_affiliation:Affiliation = rpc_add_affiliation(Color(randf(), randf(), randf()), "New Affiliation")
+	# warning-ignore:return_value_discarded
+	rpc_add_player(new_peer_id, new_affiliation, "TEMP ID")
 
 func network_peer_disconnected(id):
 	# Get a unique affiliation name from the server
