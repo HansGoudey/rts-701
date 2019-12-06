@@ -1,9 +1,10 @@
-
 extends Spatial
+
 class_name Entity
 
-# Affiliation (Should be the parent of this node)
+# General References
 var affiliation:Affiliation
+var map
 
 # Health
 var health:int = 0
@@ -24,6 +25,7 @@ var select_circle:Spatial
 
 func _ready():
 	affiliation = self.get_parent()
+	map = get_node("/root/Main/Game/Map")
 
 	set_cost()
 

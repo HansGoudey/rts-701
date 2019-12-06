@@ -22,7 +22,14 @@ func set_cost() -> void:
 		self.cost.append(10)
 
 func die() -> void:
-	pass
+	remove_from_group("Entities")
+
+	# TODO: Move this functionality to Entity.gd
+	var particles_scene = preload("res://DeathParticles.tscn")
+	var particles_node = particles_scene.instance()
+	particles_node.translation = self.translation
+	map.add_child(particles_node)
+	particles_node.restart()
 
 func set_affiliation_material() -> void:
 	$Cube.set_material_override(affiliation.color_material)

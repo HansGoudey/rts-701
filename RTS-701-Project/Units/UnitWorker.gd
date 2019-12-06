@@ -3,7 +3,7 @@ extends Unit
 func _ready():
 	type = Affiliation.UNIT_TYPE_WORKER
 	damage_type_multipliers = [1, 1, 1]
-	damage = 10
+	damage = 2
 
 #func _process(delta):
 #	pass
@@ -24,6 +24,13 @@ func set_cost():
 
 func die() -> void:
 	remove_from_group("Entities")
+
+	# TODO: Move this functionality to Entity.gd
+	var particles_scene = preload("res://DeathParticles.tscn")
+	var particles_node = particles_scene.instance()
+	particles_node.translation = self.translation
+	map.add_child(particles_node)
+	particles_node.restart()
 
 func set_affiliation_material() -> void:
 	get_child(0).set_material_override(affiliation.color_material)
