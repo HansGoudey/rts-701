@@ -197,16 +197,23 @@ remote func remove_player(peer_id:int) -> void:
 	emit_signal("lobby_ui_update")
 
 remote func server_unlock_peer_multiplayer():
+	print("Server Unlock Peer Multiplayer")
+	assert(get_tree().is_network_server())
 	# TODO: Use a more complex lock, indluding tracking which player is locked, handle timing out etc...
 	multiplayer_lock += 1
 	if multiplayer_lock == player_info.size():
+		print("Emit Multiplayer Lock Complete Signal")
 		emit_signal("multiplayer_lock_complete")
 		multiplayer_lock = 0
 		# TODO: Disconnect all connections to signal
 #		self.disconnect("multiplayer_lock_complete", ..., ...)
 
 func multiplayer_unlock():
-	rpc_id(1, "server_unlock_peer_multiplayer")
+	print("Multiplayer Unlock")
+	if get_tree().is_network_server():
+		server_unlock_peer_multiplayer()
+	else:
+		rpc_id(1, "multiplayer_lock_complete")
 
 func rpc_start_game() -> void:
 	start_game()
@@ -223,10 +230,10 @@ remote func start_game():
 	# Add the game UI for the player
 	get_player(get_tree().get_network_unique_id()).load_ui()
 
+	assert(self.connect("multiplayer_lock_complete", game_node, "place_start_map_items") == OK)
 	game_node.start_game()
 	game_started = true
-
-	self.connect("multiplayer_lock_complete", game_node, "place_start_map_items")
+	multiplayer_unlock()
 
 # Start the lobby scene to set up the game, freeing the start UI
 func start_lobby():
