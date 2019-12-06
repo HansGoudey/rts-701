@@ -29,8 +29,8 @@ func _ready() -> void:
 
 	build_ui()
 
-func rpc_push_map_selection() -> void:
-	var selection:int = map_selector.get_selected_items()[0]
+func rpc_push_map_selection(selection:int) -> void:
+	rpc("select_map", selection)
 
 remote func select_map(selection:int) -> void:
 	map_selector.select(selection)
