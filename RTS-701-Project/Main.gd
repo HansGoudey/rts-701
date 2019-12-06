@@ -18,6 +18,9 @@ var dedicated_server:bool = false
 var game_started:bool = false
 signal lobby_ui_update
 
+var multiplayer_lock:int = 0 # Lock to prevent progress until all players have reached a certain state
+signal multiplayer_lock_complete
+
 func _ready():
 	# Load start UI and connect its signals
 	var ui_scene = load("res://UI/StartUI.tscn")
@@ -53,8 +56,7 @@ func check_game_start_lobby() -> void:
 	if dedicated_server and player_info.size() < 2:
 		all_players_ready = false
 	if all_players_ready:
-		start_game()
-		rpc("start_game")
+		rpc_start_game()
 
 func rpc_assign_player_to_affiliation(player:Player, affiliation:Affiliation) -> void:
 	# Pass the paths to the player and affiliation, references don't make sense across peers
@@ -194,6 +196,22 @@ remote func remove_player(peer_id:int) -> void:
 
 	emit_signal("lobby_ui_update")
 
+remote func server_unlock_peer_multiplayer():
+	# TODO: Use a more complex lock, indluding tracking which player is locked, handle timing out etc...
+	multiplayer_lock += 1
+	if multiplayer_lock == player_info.size():
+		emit_signal("multiplayer_lock_complete")
+		multiplayer_lock = 0
+		# TODO: Disconnect all connections to signal
+#		self.disconnect("multiplayer_lock_complete", ..., ...)
+
+func multiplayer_unlock():
+	rpc_id(1, "server_unlock_peer_multiplayer")
+
+func rpc_start_game() -> void:
+	start_game()
+	rpc("start_game")
+
 # Start the game scene with the terrain, freeing the lobby UI
 remote func start_game():
 	# Load game scene
@@ -207,6 +225,8 @@ remote func start_game():
 
 	game_node.start_game()
 	game_started = true
+
+	self.connect("multiplayer_lock_complete", game_node, "place_start_map_items")
 
 # Start the lobby scene to set up the game, freeing the start UI
 func start_lobby():
@@ -268,10 +288,10 @@ func join_game() -> void:
 	elif error == ERR_CANT_CREATE:
 		print("Can't create connection")
 
-func rpc_update_lobby_ui():
+func rpc_update_lobby_ui() -> void:
 	rpc("update_lobby_ui")
 
-remote func update_lobby_ui():
+remote func update_lobby_ui() -> void:
 	emit_signal("lobby_ui_update")
 
 func network_peer_connected(new_peer_id):

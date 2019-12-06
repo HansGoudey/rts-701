@@ -7,3 +7,6 @@ func _ready():
 
 func start_game():
 	pass
+
+func place_start_map_items():
+	$Map.place_map_items()

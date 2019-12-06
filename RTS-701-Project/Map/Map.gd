@@ -1,5 +1,7 @@
 extends Spatial
 
+var main:Main = null
+
 # Navigation Node (For intersecting with terrain)
 var navigation:Navigation = null
 var navmesh_id:int = 0
@@ -17,6 +19,8 @@ var num_of_resources:int = 1
 var rng:RandomNumberGenerator = null
 
 func _ready():
+	main = get_node("/root/Main")
+
 	# Add the terrain
 	var terrain_file = preload("res://Map/SimpleTerrain.glb")
 	var terrain_node = terrain_file.instance()
@@ -36,7 +40,6 @@ func _ready():
 
 	# Initiate the 2D navigation node for unit navigation
 	navigation_2d = $Navigation2D
-#	navigation_polygon = NavigationPolygon.new()
 	navigation_polygon_instance = NavigationPolygonInstance.new()
 	navigation_polygon_instance.navpoly = NavigationPolygon.new()
 	var terrain_aabb:AABB = terrain_mesh_instance.get_transformed_aabb()
@@ -53,10 +56,13 @@ func _ready():
 	navigation_polygon_instance.enabled = true
 	navigation_2d.add_child(navigation_polygon_instance)
 
-	if get_tree().is_network_server(): # Only the server should find the random locations
-		rng = RandomNumberGenerator.new()
-		randomly_place_resources()
-		place_start_buildings()
+# Place resources after all other peers have the map node as well
+func place_map_items() -> void:
+	if not get_tree().is_network_server():
+		return # The server finds the locations and places them on the other peers
+	rng = RandomNumberGenerator.new()
+	randomly_place_resources()
+	place_start_buildings()
 
 # warning-ignore:unused_argument
 # warning-ignore:unused_argument
