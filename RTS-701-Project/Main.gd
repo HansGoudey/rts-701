@@ -213,7 +213,7 @@ func multiplayer_unlock():
 	if get_tree().is_network_server():
 		server_unlock_peer_multiplayer()
 	else:
-		rpc_id(1, "multiplayer_lock_complete")
+		rpc_id(1, "server_unlock_peer_multiplayer")
 
 func rpc_start_game() -> void:
 	start_game()
