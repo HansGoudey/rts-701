@@ -14,7 +14,7 @@ func _ready():
 # =================================================================================================
 
 func initialize_health() -> void:
-	maximum_health = 100
+	maximum_health = 20
 	health = maximum_health
 
 func set_cost():
